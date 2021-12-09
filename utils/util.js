@@ -12,6 +12,10 @@ exports.hashPassword= (password)=>{
     return hashedpassword;
 }
 
+exports.verifypassword=(password,hashedpassword)=>{
+    return bcrypt.compareSync(password,hashedpassword);
+}
+
 exports.successmessage=(message,payload)=>{
     return {
         success:true,

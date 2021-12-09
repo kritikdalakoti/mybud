@@ -1,5 +1,5 @@
 const User=require('../models/usermodel');
-const {generateToken,hashPassword,successmessage,errormessage}=require('../utils/util');
+const {generateToken,hashPassword,successmessage,errormessage,verifypassword}=require('../utils/util');
 
 
 exports.UserSignUp=async(req,res)=>{
@@ -46,5 +46,32 @@ exports.UserSignUp=async(req,res)=>{
 
     }catch(err){
         res.status(400).json(errormessage(err.message))
+    }
+}
+
+exports.LoginUser=async (req,res)=>{
+    try{
+        console.log(req.headers);
+        let {username,password}=req.body;
+
+        username=username.trim();
+        password=password.trim();
+
+        // check whether email exists or not
+        let user=await User.findOne({username});
+        if(!user){
+            return res.status(400).json(errormessage("Email or password incorrect!"));
+        }
+
+        if(!verifypassword(password,user.password)){
+            return res.status(400).json(errormessage("Email or password incorrect!"));
+        }
+
+        let token=generateToken( JSON.stringify(user._id));
+
+        res.status(200).json(successmessage("Logged In Successfuly!",token));
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
     }
 }
