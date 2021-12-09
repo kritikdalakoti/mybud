@@ -2,7 +2,8 @@ const jwt =require('jsonwebtoken');
 const bcrypt=require('bcryptjs');
 
 exports.generateToken=(userid)=>{
-    const token= jwt.sign(userid,process.env.TOKEN_SECRET);
+    // const token= jwt.sign(userid,process.env.TOKEN_SECRET);
+    const token= jwt.sign(userid,"MYBUDSECRET");
     return token;
 }
 
