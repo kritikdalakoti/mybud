@@ -3,13 +3,18 @@ const router = express.Router();
 const Usercontroller = require('../controllers/user');
 const { auth } = require('../middleware/auth');
 const User = require('../models/usermodel');
+const multer=require('multer')
+
+const upload=multer();
 
 router.post(
     '/signup',
+    upload.none(),
     Usercontroller.UserSignUp
 );
 router.post(
     '/login',
+    upload.none(),
     Usercontroller.LoginUser
 );
 router.get('/me', auth, async (req, res) => {
@@ -19,6 +24,7 @@ router.get('/me', auth, async (req, res) => {
 
 router.post(
     '/verifyemail',
+    upload.none(),
     Usercontroller.verifyCode
 );
 

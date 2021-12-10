@@ -4,6 +4,7 @@ const { generateToken, hashPassword, successmessage, errormessage, verifypasswor
 
 exports.UserSignUp = async (req, res) => {
     try {
+        console.log(req.body)
         let { username, password, email, phoneno } = req.body;
         if (!username || !password || !email || !phoneno) {
             return res.status(400).json(errormessage("All fields must be present"));
@@ -107,4 +108,8 @@ exports.verifyCode = async (req, res) => {
     } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
+}
+
+exports.resendOTP=()=>{
+
 }
