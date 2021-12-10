@@ -95,10 +95,10 @@ exports.LoginUser = async (req, res) => {
 
 exports.verifyCode = async (req, res) => {
     try {
-        let { code } = req.body;
-        let user = await User.findOne({ confirmationcode: code });
+        let { code,email } = req.body;
+        let user = await User.findOne({ email,confirmationcode: code });
         if (!user) {
-            return res.status(404).json(errormessage("User not Found!"));
+            return res.status(404).json(errormessage("Not Valid code!"));
         }
 
         user.status = true;
@@ -107,8 +107,4 @@ exports.verifyCode = async (req, res) => {
     } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
-
-
-
-
 }
