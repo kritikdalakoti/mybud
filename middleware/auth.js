@@ -13,7 +13,6 @@ exports.auth=async (req,res,next)=>{
         }
     
         let userid=jwt.verify(token,process.env.TOKEN_SECRET);
-        console.log(userid)
         let user=await User.findOne({_id:JSON.parse(userid)})
         if(!user.status){
             return res.status(400).json(errormessage("Email not verified!"));

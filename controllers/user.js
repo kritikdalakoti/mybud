@@ -31,7 +31,7 @@ exports.UserSignUp=async(req,res)=>{
         //hashing the password
         let hashedpassword=hashPassword(password);
 
-        let confirmationcode=generateToken("code");
+        let confirmationcode=generateToken(`${email}_${username}`);
 
         let user=new User({
             username,
