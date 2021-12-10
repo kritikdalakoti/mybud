@@ -17,6 +17,11 @@ const UserSchema= new mongoose.Schema({
     },
     phoneno:{
         type:String,
+    },
+    confirmationcode:String,
+    status:{
+        type:Boolean,
+        default:false
     }
 })
 

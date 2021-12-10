@@ -18,7 +18,7 @@ const options = {
 	socketTimeoutMS: 9000000,
 };
 console.log(process.env.MONGOURI)
-mongoose.connect("mongodb+srv://user:PyANTXS4a59rmPl9@cluster0.le4ng.mongodb.net/mybud?authSource=admin&replicaSet=atlas-ivefmz-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true", options);
+mongoose.connect(process.env.MONGOURI, options);
 mongoose.connection.on('connected', () => {
 	console.log('connected to database!');
 });

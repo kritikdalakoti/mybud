@@ -1,5 +1,5 @@
 const User=require('../models/usermodel');
-const {generateToken,hashPassword,successmessage,errormessage,verifypassword}=require('../utils/util');
+const {generateToken,hashPassword,successmessage,errormessage,verifypassword,sendEmail}=require('../utils/util');
 
 
 exports.UserSignUp=async(req,res)=>{
@@ -31,17 +31,28 @@ exports.UserSignUp=async(req,res)=>{
         //hashing the password
         let hashedpassword=hashPassword(password);
 
+        let confirmationcode=generateToken("code");
+
         let user=new User({
             username,
             password:hashedpassword,
             email,
-            phoneno
+            phoneno,
+            confirmationcode
         });
 
         //generating token
         const token=generateToken( JSON.stringify(user._id) );
 
         await user.save();
+
+        let result=await sendEmail(user.email,user.confirmationcode,user.username);
+        console.log(result);
+        if(result.error){
+            console.log("Email not sent!")
+            return res.status(200).json(errormessage("Email not sent!"));
+        }
+
         res.status(200).json(successmessage("User Created!",token));
 
     }catch(err){
@@ -67,6 +78,12 @@ exports.LoginUser=async (req,res)=>{
             return res.status(400).json(errormessage("Email or password incorrect!"));
         }
 
+        //checking whether verified email or not
+        if(!user.status){
+            return res.status(400).json(errormessage("Email not Verified! Please verify your mail!"));
+        }
+
+
         let token=generateToken( JSON.stringify(user._id));
 
         res.status(200).json(successmessage("Logged In Successfuly!",token));
@@ -74,4 +91,24 @@ exports.LoginUser=async (req,res)=>{
     }catch(err){
         res.status(400).json(errormessage(err.message));
     }
+}
+
+exports.verifyCode=async (req,res)=>{
+    try{
+        let {code}=req.params;
+        let user=await User.findOne({confirmationcode:code});
+        if(!user){
+            return res.status(404).json(errormessage("User not Found!"));
+        }
+    
+        user.status=true;
+        await user.save();
+        res.status(200).json(successmessage("Verified Succesfuly!",user))
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+    
+
+
+
 }

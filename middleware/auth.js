@@ -1,8 +1,8 @@
-const {errormessage,successmessage}=require('../utils/util')
+const {errormessage,successmessage}=require('../utils/util');
 const jwt=require('jsonwebtoken');
+const User =require('../models/usermodel');
 
-
-exports.auth=(req,res,next)=>{
+exports.auth=async (req,res,next)=>{
     try{
         const header=req.headers["authorization"];
         console.log(header);
@@ -12,8 +12,12 @@ exports.auth=(req,res,next)=>{
             return res.status(400).json(errormessage("Token not present!"));
         }
     
-        let userid=jwt.verify(token,"MYBUDSECRET");
-        console.log(userid);
+        let userid=jwt.verify(token,process.env.TOKEN_SECRET);
+        console.log(userid)
+        let user=await User.findOne({_id:JSON.parse(userid)})
+        if(!user.status){
+            return res.status(400).json(errormessage("Email not verified!"));
+        }
     
         req.user=userid;
         next();
