@@ -17,8 +17,8 @@ router.get('/me', auth, async (req, res) => {
     res.json(user);
 })
 
-router.get(
-    '/confirm/:code',
+router.post(
+    '/verifyemail',
     Usercontroller.verifyCode
 );
 

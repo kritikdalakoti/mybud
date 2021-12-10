@@ -53,9 +53,7 @@ exports.sendEmail = async (email, code, username) => {
 
     htmlContent:`<h1>Email Confirmation</h1>
     <h2>Hello ${username}</h2>
-    <p>Thank you for subscribing. Please confirm your email by clicking on the following link</p>
-    <a href=https://sheltered-earth-76230.herokuapp.com/user/confirm/${code}> Click here</a>
-    </div>`,
+    <p>Thank you for subscribing. Your Verification code is ${code}</div>`,
   }
 
   try{
