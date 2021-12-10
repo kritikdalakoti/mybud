@@ -28,4 +28,10 @@ router.post(
     Usercontroller.verifyCode
 );
 
+router.post(
+    '/resendotp',
+    upload.none(),
+    Usercontroller.resendOTP
+)
+
 module.exports = router;

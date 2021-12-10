@@ -66,6 +66,10 @@ exports.LoginUser = async (req, res) => {
         console.log(req.headers);
         let { username, password } = req.body;
 
+        if(!username||!password){
+            return res.status(400).json(errormessage("All fields should be present!"));
+        }
+
         username = username.trim();
         password = password.trim();
 
@@ -96,8 +100,13 @@ exports.LoginUser = async (req, res) => {
 
 exports.verifyCode = async (req, res) => {
     try {
-        let { code,email } = req.body;
-        let user = await User.findOne({ email,confirmationcode: code });
+        let { code, email } = req.body;
+
+        if(!code||!email){
+            return res.status(400).json(errormessage("All fields must be present!"));
+        }
+
+        let user = await User.findOne({ email, confirmationcode: code });
         if (!user) {
             return res.status(404).json(errormessage("Not Valid code!"));
         }
@@ -110,6 +119,33 @@ exports.verifyCode = async (req, res) => {
     }
 }
 
-exports.resendOTP=()=>{
+exports.resendOTP = async (req, res) => {
+    try {
+        let { email } = req.body;
+
+        if(!email){
+            return res.status(400).json(errormessage("Email field should be given !"));
+        }
+
+        let user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json(errormessage("User not found!"));
+        }
+
+        let confirmationcode = Math.floor(1000 + Math.random() * 9000);
+        user.confirmationcode = confirmationcode;
+        await user.save();
+
+        let result = await sendEmail(user.email, user.confirmationcode, user.username);
+
+        if (result.error) {
+            console.log("Email not sent!")
+            return res.status(200).json(errormessage("Email not sent!"));
+        }
+        res.status(200).json(successmessage("Email sent!"));
+    } catch (err) {
+        res.status(400).json(errormessage(err.message));
+    }
+
 
 }
