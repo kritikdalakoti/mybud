@@ -1,6 +1,12 @@
 const User = require('../models/usermodel');
-const { generateToken, hashPassword, successmessage, errormessage, verifypassword, sendEmail } = require('../utils/util');
-
+const { generateToken, hashPassword, successmessage, 
+    errormessage, verifypassword, sendEmail ,
+    uploadAws ,deletefiles,getImage 
+} = require('../utils/util');
+const fs=require('fs');
+const { v4: uuidv4 }=require('uuid');
+const path=require('path');
+const mongoose = require('mongoose');
 
 exports.UserSignUp = async (req, res) => {
     try {
@@ -15,11 +21,19 @@ exports.UserSignUp = async (req, res) => {
         email = email.trim();
         phoneno = phoneno.trim();
 
-        //checking if email exists already
-        let ismatch = await User.findOne({ email })
+        //checking if email exists already and not verified
+        let ismatch = await User.findOne({ email,status:false });
         if (ismatch) {
-            return res.status(400).json(errormessage("Email already registered! Try with some other email!"))
+            return res.status(400).json(errormessage("Email already registered! Verify email to continue!"));
         }
+
+        //checking if email exists already and verified
+        let ismatch = await User.findOne({ email,status:true });
+        if (ismatch) {
+            return res.status(400).json(errormessage("Email already registered and verified! Login to proceed!"));
+        }
+
+
 
         // checking valid phone no.
         let reg = "(?:(?:\\+|0{0,2})91(\\s*[\\-]\\s*)?|[0]?)?[789]\\d{9}";
@@ -146,6 +160,121 @@ exports.resendOTP = async (req, res) => {
     } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
-
-
 }
+
+exports.Uploadimage=async(req,res)=>{
+    try{
+        console.log(req.file);
+        if(!req.file){
+            return res.status(400).json(errormessage("Image not provided!"))
+        }
+        let filetype=req.file.filename.split('.')[1];
+        let data = fs.readFileSync(`${path.join(__dirname, '../uploads/')}${req.file.filename}`);
+        let uploads={
+            Bucket:"df",
+            Key:`${uuidv4()}.${filetype}`,
+            Body:data
+        }
+
+        // let result=await uploadAws(uploads);
+        // if(result.error){
+        //     res.status(500).json(errormessage("Something went wrong!"));
+        // }
+
+        // update the returned key in user database too.
+        let updates={
+            image:{
+                key:result,
+                filename:req.file.filename
+            }
+        }
+        await User.findOneAndUpdate({_id: mongoose.Types.ObjectId(JSON.parse(req.user)) },{$set:updates});
+
+        let directory=path.join(__dirname,'../uploads');
+        deletefiles(directory);
+
+        res.status(200).json(successmessage("File Uploaded Successfuly!"));
+
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+exports.getUserimage=async(req,res)=>{
+    try{
+        let {user}=req;
+        let result=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
+
+        let params={
+            Key:result.image.key,
+            Bucket:process.env.AWS_BUCKET_NAME,
+        }
+
+        let res1=await getImage(params,res);
+        if(res1.error){
+            return res.status(400).json(errormessage(res1.error));
+        }
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+exports.setdetails=async(req,res)=>{
+    try{
+        let {profession,details,objective,target}=req.body;
+
+        if(!profession||!details||!objective||!target){
+            res.status(400).json(errormessage("All fields should be given!"));
+        }
+
+        let updates={
+            Info:{
+                profession,
+                details
+            },
+            objective:{
+                title:objective,
+                target
+            }
+        }
+
+        let user=await User.findOneAndUpdate({_id:mongoose.Types.ObjectId(JSON.parse(req.user))},{$set:updates},{new:true});
+        if(!user){
+            return res.status(400).json(errormessage("Something went wrong!"));
+        }
+
+        res.status(200).json(successmessage("Updated Successfuly!",user));
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+exports.getProfile= async (req,res)=>{
+    try{
+        
+        let user=await User.findOne({_id: mongoose.Types.ObjectId(JSON.parse(req.user)) });
+        
+        if(!user){
+            return res.status(400).json(errormessage(err.message));
+        }
+        
+        let params={
+            Key:user.image.key,
+            Bucket:process.env.AWS_BUCKET_NAME,
+        }
+
+        let res1=await getImage(params,res);
+        if(res1.error){
+            return res.status(400).json(errormessage(res1.error));
+        }
+
+        
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+

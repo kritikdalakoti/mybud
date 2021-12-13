@@ -5,7 +5,6 @@ const User =require('../models/usermodel');
 exports.auth=async (req,res,next)=>{
     try{
         const header=req.headers["authorization"];
-        console.log(header);
         const token=header.split(" ")[1];
     
         if(!token){
@@ -21,6 +20,6 @@ exports.auth=async (req,res,next)=>{
         req.user=userid;
         next();
     }catch(err){
-        res.status(400).json(errormessage(err.message))
+        res.status(400).json(errormessage(err.message));
     }
 }

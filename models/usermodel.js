@@ -22,6 +22,18 @@ const UserSchema= new mongoose.Schema({
     status:{
         type:Boolean,
         default:false
+    },
+    image:{
+        key:String,
+        filename:String
+    },
+    Info:{
+        profession:String,
+        details:String
+    },
+    objective:{
+        title:String,
+        target:String
     }
 })
 
