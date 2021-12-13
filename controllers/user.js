@@ -28,8 +28,8 @@ exports.UserSignUp = async (req, res) => {
         }
 
         //checking if email exists already and verified
-        let ismatch = await User.findOne({ email,status:true });
-        if (ismatch) {
+        let ismatch1 = await User.findOne({ email,status:true });
+        if (ismatch1) {
             return res.status(400).json(errormessage("Email already registered and verified! Login to proceed!"));
         }
 
