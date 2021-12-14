@@ -76,10 +76,11 @@ exports.sendEmail = async (email, code, username) => {
 exports.uploadAws = async (params) => {
 
   try {
-    let { Key } = await s3.upload(params).promise();
-    return Key;
+    let data = await s3.upload(params).promise();
+    return data.Key;
   } catch (err) {
-    return this.errormessage("Upload Error!");
+    console.log(err);
+    return this.errormessage(err.message);
   }
 }
 
@@ -96,12 +97,24 @@ exports.deletefiles = (directory) => {
 
 }
 
-exports.getImage=async(params,res)=>{
-  try{
-    const data = await s3.getObject(params).promise();
-    let readStream=data.createReadStream();
-    readStream.pipe(res);
-  }catch(err){
-    return this.errormessage(err.message);
-  }
+exports.getImage=(params,res)=>{
+
+  return new Promise((resolve,reject)=>{
+    s3.getObject(params).createReadStream().on(
+      "error",(error)=>{
+        reject(error);
+      }
+    ).pipe(res);
+  })
+
+  // try{
+  //   console.log(params)
+  //   const readstream = s3.getObject(params).createReadStream();
+  //   // console.log(data);
+  //   // let readStream=data.Body.createReadStream();
+  //   // console.log(readStream);
+  //   readstream.pipe(res);
+  // }catch(err){
+  //   return res.status(400).json(this.errormessage(err.message));
+  // }
 }

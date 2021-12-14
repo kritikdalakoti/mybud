@@ -171,17 +171,17 @@ exports.Uploadimage=async(req,res)=>{
         let filetype=req.file.filename.split('.')[1];
         let data = fs.readFileSync(`${path.join(__dirname, '../uploads/')}${req.file.filename}`);
         let uploads={
-            Bucket:"df",
+            Bucket:process.env.AWS_BUCKET_NAME,
             Key:`${uuidv4()}.${filetype}`,
             Body:data
         }
 
-        // let result=await uploadAws(uploads);
-        // if(result.error){
-        //     res.status(500).json(errormessage("Something went wrong!"));
-        // }
+        let result=await uploadAws(uploads);
+        if(result.error){
+            res.status(500).json(errormessage(result.error));
+        }
 
-        // update the returned key in user database too.
+        //update the returned key in user database too.
         let updates={
             image:{
                 key:result,
@@ -204,17 +204,19 @@ exports.Uploadimage=async(req,res)=>{
 exports.getUserimage=async(req,res)=>{
     try{
         let {user}=req;
+        let {key}=req.body;
         let result=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
 
+        if(!result){
+            return res.status(404).json(errormessage("No user found!"));
+        }
+
         let params={
-            Key:result.image.key,
+            Key:key?key:result.image.key ,
             Bucket:process.env.AWS_BUCKET_NAME,
         }
 
-        let res1=await getImage(params,res);
-        if(res1.error){
-            return res.status(400).json(errormessage(res1.error));
-        }
+        await getImage(params,res);
 
     }catch(err){
         res.status(400).json(errormessage(err.message));
@@ -258,20 +260,9 @@ exports.getProfile= async (req,res)=>{
         let user=await User.findOne({_id: mongoose.Types.ObjectId(JSON.parse(req.user)) });
         
         if(!user){
-            return res.status(400).json(errormessage(err.message));
+            return res.status(404).json(errormessage("User not found!"));
         }
-        
-        let params={
-            Key:user.image.key,
-            Bucket:process.env.AWS_BUCKET_NAME,
-        }
-
-        let res1=await getImage(params,res);
-        if(res1.error){
-            return res.status(400).json(errormessage(res1.error));
-        }
-
-        
+        res.status(200).json(successmessage("User Profile",user));
 
     }catch(err){
         res.status(400).json(errormessage(err.message));

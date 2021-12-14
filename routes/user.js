@@ -65,10 +65,12 @@ router.post(
     Usercontroller.setdetails
 )
 
-// router.get(
-//     '/get/profile',
-//     auth,
+router.get(
+    '/get/profile',
+    auth,
+    upload.none(),
+    Usercontroller.getProfile
     
-// )
+)
 
 module.exports = router;
