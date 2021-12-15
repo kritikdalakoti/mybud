@@ -10,6 +10,7 @@ app.use(cors({limit: '50mb'}));
 
 // Importing Routes
 app.use('/user',require('./routes/user'));
+app.use('/card',require('./routes/cards'));
 
 const options = {
 	useNewUrlParser: true,

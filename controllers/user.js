@@ -172,7 +172,7 @@ exports.Uploadimage=async(req,res)=>{
         let data = fs.readFileSync(`${path.join(__dirname, '../uploads/')}${req.file.filename}`);
         let uploads={
             Bucket:process.env.AWS_BUCKET_NAME,
-            Key:`${uuidv4()}.${filetype}`,
+            Key:`uploads/${uuidv4()}.${filetype}`,
             Body:data
         }
 
@@ -212,7 +212,7 @@ exports.getUserimage=async(req,res)=>{
         }
 
         let params={
-            Key:key?key:result.image.key ,
+            Key:key?`uploads/${key}`:`uploads/${result.image.key}` ,
             Bucket:process.env.AWS_BUCKET_NAME,
         }
 
