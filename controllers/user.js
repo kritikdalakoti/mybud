@@ -210,12 +210,11 @@ exports.getUserimage=async(req,res)=>{
         if(!result){
             return res.status(404).json(errormessage("No user found!"));
         }
-
+        console.log(result.image.key);
         let params={
-            Key:key?`uploads/${key}`:`uploads/${result.image.key}` ,
+            Key:key?`${key}`:`${result.image.key}` ,
             Bucket:process.env.AWS_BUCKET_NAME,
         }
-
         await getImage(params,res);
 
     }catch(err){
