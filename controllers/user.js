@@ -190,8 +190,8 @@ exports.Uploadimage=async(req,res)=>{
         }
         await User.findOneAndUpdate({_id: mongoose.Types.ObjectId(JSON.parse(req.user)) },{$set:updates});
 
-        let directory=path.join(__dirname,'../uploads');
-        deletefiles(directory);
+        // let directory=path.join(__dirname,'../uploads');
+        // deletefiles(directory);
 
         res.status(200).json(successmessage("File Uploaded Successfuly!"));
 
