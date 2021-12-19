@@ -73,11 +73,12 @@ exports.getCards = async (req, res) => {
         let perpage = 10;
 
         let { page } = req.body;
-        if(!page){
+        if(!page||!parseInt(page)){
             return res.status(400).json(errormessage("Page no should be present or should not be zero!"))
         }
 
         page = parseInt(page);
+        
 
         let start = (page - 1) * perpage;
 
