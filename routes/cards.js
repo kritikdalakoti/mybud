@@ -14,9 +14,10 @@ router.post(
     cardController.swipecard
 )
 
-router.get(
+router.post(
     '/getcards',
     auth,
+    upload.none(),
     cardController.getCards
 )
 

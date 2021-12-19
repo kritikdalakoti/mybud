@@ -70,6 +70,16 @@ exports.swipecard = async (req, res) => {
 exports.getCards = async (req, res) => {
     try {
         let { user } = req;
+        let perpage = 10;
+
+        let { page } = req.body;
+        if(!page){
+            return res.status(400).json(errormessage("Page no should be present or should not be zero!"))
+        }
+
+        page = parseInt(page);
+
+        let start = (page - 1) * perpage;
 
         // getting all users current user has left swiped
         let dislikedusers = await Swipe.aggregate([
@@ -87,13 +97,48 @@ exports.getCards = async (req, res) => {
             }
         ]).allowDiskUse(true);
 
-        let filtered_array=dislikedusers[0].swipedusers;
+        let filtered_array = dislikedusers[0].swipedusers;
 
-        let eligibleusers=await User.find({_id:{$nin:filtered_array}});
-        res.status(200).json(successmessage("Successfuly fetched Cards!",eligibleusers));
+        let findConditions = {
+             _id: { $nin: filtered_array } 
+    };
 
+    user=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
 
-    } catch (err) {
-        res.status(400).json(errormessage(err.message));
+    // storing the profession and objective of the user who's swiping so that can sort accordingly.
+    let profession=user.Info.profession;
+    let objective=user.objective.title;
+
+    let eligibleusers = await User.aggregate([
+
+        { $match: findConditions },
+        {$addFields:{
+            rank1:{$cond:[{$eq:["$Info.profession",profession]},1,-1]}
+        }},
+        {$addFields:{
+            rank2:{$cond:[{$eq:["$objective.title",objective]},1,-1]}
+        }},
+        {$sort:{rank1:-1,rank2:-1}},  // sorting according the user profession and objective
+        { $skip: start },
+        { $limit: perpage },
+        
+        
+    ]).allowDiskUse(true);
+
+    let totalNumber = eligibleusers.length;
+
+    let result = {
+        message: 'File List Page Number ' + page,
+        data: eligibleusers,
+        count: totalNumber,
+        page:page,
+        success: true
     }
+
+    res.status(200).json(result);
+
+
+} catch (err) {
+    res.status(400).json(errormessage(err.message));
+}
 }
