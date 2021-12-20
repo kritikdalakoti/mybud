@@ -51,7 +51,7 @@ router.post(
     Usercontroller.Uploadimage
 )
 
-router.post(
+router.get(
     '/get/image',
     auth,
     upload.none(),

@@ -204,7 +204,8 @@ exports.Uploadimage=async(req,res)=>{
 exports.getUserimage=async(req,res)=>{
     try{
         let {user}=req;
-        let {key}=req.body;
+        let {key}=req.query;
+        console.log(key);
         let result=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
 
         if(!result){

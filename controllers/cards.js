@@ -70,9 +70,11 @@ exports.swipecard = async (req, res) => {
 exports.getCards = async (req, res) => {
     try {
         let { user } = req;
+        
         let perpage = 10;
 
-        let { page } = req.body;
+        let {page}=req.query;
+        console.log(page);
         if(!page||!parseInt(page)){
             return res.status(400).json(errormessage("Page no should be present or should not be zero!"))
         }
