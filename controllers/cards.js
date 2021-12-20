@@ -100,7 +100,9 @@ exports.getCards = async (req, res) => {
             }
         ]).allowDiskUse(true);
 
-        let filtered_array = dislikedusers[0].swipedusers;
+        console.log(dislikedusers);
+
+        let filtered_array = dislikedusers.length?dislikedusers[0].swipedusers:[];
 
         let findConditions = {
              _id: { $nin: filtered_array } 
