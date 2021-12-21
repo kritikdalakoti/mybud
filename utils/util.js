@@ -77,7 +77,7 @@ exports.uploadAws = async (params) => {
 
   try {
     let data = await s3.upload(params).promise();
-    return data.Key;
+    return data;
   } catch (err) {
     console.log(err);
     return this.errormessage(err.message);
@@ -100,6 +100,7 @@ exports.deletefiles = (directory) => {
 exports.getImage=(params,res)=>{
 
   return new Promise((resolve,reject)=>{
+    
     s3.getObject(params).createReadStream().on(
       "error",(error)=>{
         reject(error);

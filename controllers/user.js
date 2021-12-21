@@ -173,7 +173,9 @@ exports.Uploadimage=async(req,res)=>{
         let uploads={
             Bucket:process.env.AWS_BUCKET_NAME,
             Key:`uploads/${uuidv4()}.${filetype}`,
-            Body:data
+            Body:data,
+            ContentType:req.file.mimetype,
+            ContentDisposition: 'inline'
         }
 
         let result=await uploadAws(uploads);
@@ -184,8 +186,9 @@ exports.Uploadimage=async(req,res)=>{
         //update the returned key in user database too.
         let updates={
             image:{
-                key:result,
-                filename:req.file.filename
+                key:result.Key,
+                filename:req.file.filename,
+                location:result.Location
             }
         }
         await User.findOneAndUpdate({_id: mongoose.Types.ObjectId(JSON.parse(req.user)) },{$set:updates});
@@ -211,12 +214,24 @@ exports.getUserimage=async(req,res)=>{
         if(!result){
             return res.status(404).json(errormessage("No user found!"));
         }
-        console.log(result.image.key);
-        let params={
-            Key:key?`${key}`:`${result.image.key}` ,
-            Bucket:process.env.AWS_BUCKET_NAME,
+
+        let usernew="";
+
+        if(key){
+            usernew=await User.findOne({'image.key':key});
         }
-        await getImage(params,res);
+
+        console.log(user)
+        let location=result.image.location?result.image.location:"";
+
+        let data=key?usernew.image.location:location;
+
+        res.status(200).json(successmessage("Successfuly Fetched",data));
+        // let params={
+        //     Key:key?`${key}`:`${result.image.key}` ,
+        //     Bucket:process.env.AWS_BUCKET_NAME,
+        // }
+        // await getImage(params,res);
 
     }catch(err){
         res.status(400).json(errormessage(err.message));

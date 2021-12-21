@@ -25,7 +25,8 @@ const UserSchema= new mongoose.Schema({
     },
     image:{
         key:String,
-        filename:String
+        filename:String,
+        location:String
     },
     Info:{
         profession:String,
