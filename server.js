@@ -21,6 +21,7 @@ app.use(cors({ limit: '50mb' }));
 app.use('/user', require('./routes/user'));
 app.use('/card', require('./routes/cards'));
 app.use('/task',require('./routes/task'));
+app.use('/admin',require('./routes/admin'));
 
 
 const options = {

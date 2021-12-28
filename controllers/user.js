@@ -38,8 +38,8 @@ exports.UserSignUp = async (req, res) => {
         // checking valid phone no.
         let reg = "(?:(?:\\+|0{0,2})91(\\s*[\\-]\\s*)?|[0]?)?[789]\\d{9}";
         let phonereg = new RegExp(reg);
-
-        if (!phonereg.test(phoneno) === null) {
+        console.log(phonereg.test(phoneno));
+        if (!phonereg.test(phoneno)) {
             return res.status(400).json(errormessage("Enter valid Phone Number"));
         }
 
