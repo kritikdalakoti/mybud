@@ -35,7 +35,11 @@ const UserSchema= new mongoose.Schema({
     objective:{
         title:String,
         target:String
-    }
+    },
+    skillsets:[
+        {type:String}
+    ],
+    linkedinprofile:String
 })
 
 UserSchema.index({username:1,email:1});

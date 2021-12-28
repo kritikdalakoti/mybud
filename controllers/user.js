@@ -183,7 +183,7 @@ exports.Uploadimage=async(req,res)=>{
             res.status(500).json(errormessage(result.error));
         }
 
-        //update the returned key in user database too.
+        //update the returned key and location in user database too.
         let updates={
             image:{
                 key:result.Key,
@@ -240,10 +240,10 @@ exports.getUserimage=async(req,res)=>{
 
 exports.setdetails=async(req,res)=>{
     try{
-        let {profession,details,objective,target}=req.body;
+        let {profession,details,objective,target,skillsets,linkedinprofile}=req.body;
 
-        if(!profession||!details||!objective||!target){
-            res.status(400).json(errormessage("All fields should be given!"));
+        if(!profession||!details||!objective||!target||!skillsets||!linkedinprofile){
+            return res.status(400).json(errormessage("All fields should be given!"));
         }
 
         let updates={
@@ -254,7 +254,9 @@ exports.setdetails=async(req,res)=>{
             objective:{
                 title:objective,
                 target
-            }
+            },
+            skillsets,
+            linkedinprofile
         }
 
         let user=await User.findOneAndUpdate({_id:mongoose.Types.ObjectId(JSON.parse(req.user))},{$set:updates},{new:true});

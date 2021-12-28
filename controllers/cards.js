@@ -126,8 +126,6 @@ exports.getCards = async (req, res) => {
         {$sort:{rank1:-1,rank2:-1}},  // sorting according the user profession and objective
         { $skip: start },
         { $limit: perpage },
-        
-        
     ]).allowDiskUse(true);
 
     let totalNumber = eligibleusers.length;

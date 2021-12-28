@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const messageSchema = new mongoose.Schema(
     {
         //chating members:2 member for private chat//
-        roomid:String,
+        // roomid:String,
         members:[mongoose.Schema.Types.ObjectId],
         memberslength:{
             type:Number,

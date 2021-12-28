@@ -36,7 +36,7 @@ exports.addinroom=async(member,roomid)=>{
     
 }
 
-exports.storeMessage=async(message,roomid,sender,reciever)=>{
+exports.storeMessage=async(message,sender,reciever)=>{
 
     let updates={
         sender:mongoose.Types.ObjectId(sender),
@@ -45,7 +45,17 @@ exports.storeMessage=async(message,roomid,sender,reciever)=>{
         created:Date.now
     }
 
-    await Message.findOneAndUpdate({roomid},{$push:{messages:updates}});
+    let findConditions={
+        members:{$or:[[
+            mongoose.Types.ObjectId(sender),
+            mongoose.Types.ObjectId(reciever)
+        ],[
+            mongoose.Types.ObjectId(reciever),
+            mongoose.Types.ObjectId(sender)
+        ]]}
+        }
+
+    await Message.findOneAndUpdate(findConditions,{$push:{messages:updates}});
 }
 
 exports.userunmatched=async(roomid)=>{
