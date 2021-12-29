@@ -70,7 +70,19 @@ router.get(
     auth,
     upload.none(),
     Usercontroller.getProfile
-    
+)
+
+router.post(
+    '/add/location',
+    auth,
+    upload.none(),
+    Usercontroller.addLocation
+)
+
+router.get(
+    '/allskills',
+    auth,
+    Usercontroller.getSkills
 )
 
 module.exports = router;

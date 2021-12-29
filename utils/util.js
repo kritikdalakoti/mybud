@@ -108,14 +108,9 @@ exports.getImage=(params,res)=>{
     ).pipe(res);
   })
 
-  // try{
-  //   console.log(params)
-  //   const readstream = s3.getObject(params).createReadStream();
-  //   // console.log(data);
-  //   // let readStream=data.Body.createReadStream();
-  //   // console.log(readStream);
-  //   readstream.pipe(res);
-  // }catch(err){
-  //   return res.status(400).json(this.errormessage(err.message));
-  // }
+
 }
+
+exports.allskills=[
+  "test"
+];

@@ -1,7 +1,7 @@
 const User = require('../models/usermodel');
 const { generateToken, hashPassword, successmessage, 
     errormessage, verifypassword, sendEmail ,
-    uploadAws ,deletefiles,getImage 
+    uploadAws ,allskills 
 } = require('../utils/util');
 const fs=require('fs');
 const { v4: uuidv4 }=require('uuid');
@@ -284,5 +284,29 @@ exports.getProfile= async (req,res)=>{
     }catch(err){
         res.status(400).json(errormessage(err.message));
     }
+}
+
+exports.addLocation=async(req,res)=>{
+    try{
+        let {location}=req.body;
+        let {user}=req;
+
+        if(!location){
+            return res.status(400).json(errormessage("Provide lOcation!"));
+        }
+
+        let updateduser=await User.findOneAndUpdate({_id:JSON.parse((user))},{$set:{location}},{new:true});
+        if(!user){
+            return res.status(400).json(errormessage("Couldn't Update"));
+        }
+        res.status(200).json(successmessage("Successfuly Updated!",updateduser));
+    }catch(err){
+        console.log(err);
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+exports.getSkills=(req,res)=>{
+    res.status(200).json(successmessage("all skills",allskills));
 }
 
