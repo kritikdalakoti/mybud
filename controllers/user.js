@@ -310,3 +310,16 @@ exports.getSkills=(req,res)=>{
     res.status(200).json(successmessage("all skills",allskills));
 }
 
+exports.getfilteredskills=async(req,res)=>{
+    try{
+        let {keyword}=req.query;
+        let skills=allskills;
+        let regtomatch=new RegExp(`^${keyword}.*`,'ig');
+        
+        let filteredskills=skills.filter((skill)=>skill.match(regtomatch)?skill:null );
+        res.status(200).json(successmessage("Filtered Skills",filteredskills));
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+

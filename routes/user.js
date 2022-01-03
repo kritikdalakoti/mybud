@@ -85,4 +85,10 @@ router.get(
     Usercontroller.getSkills
 )
 
+router.get(
+    '/filteredskills',
+    auth,
+    Usercontroller.getfilteredskills
+)
+
 module.exports = router;
