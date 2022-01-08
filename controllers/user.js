@@ -241,11 +241,13 @@ exports.getUserimage=async(req,res)=>{
 exports.setdetails=async(req,res)=>{
     try{
         let {profession,details,objective,target,skillsets,linkedinprofile}=req.body;
+        console.log('fdgd',skillsets)
 
         if(!profession||!details||!objective||!target||!skillsets||!linkedinprofile){
             return res.status(400).json(errormessage("All fields should be given!"));
         }
-
+        skillsets=skillsets.split(",");
+        console.log(skillsets);
         let updates={
             Info:{
                 profession,
