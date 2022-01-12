@@ -364,13 +364,10 @@ exports.sendInvite=async(req,res)=>{
             return res.status(404).json(errormessage("No User found!"));
         }
 
-        let array1=[
-
-        ]
 
         let isMatch=await MatchSchema.findOne({$or:[
-            {users:[mongoose.Types.ObjectId(JSON.parse(user)),inviteuser._id]},
-            {users:[inviteuser._id,mongoose.Types.ObjectId(JSON.parse(user))]}
+            {users:[user._id,inviteuser._id]},
+            {users:[inviteuser._id,user._id]}
         ]});
 
         if(isMatch){
