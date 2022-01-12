@@ -363,6 +363,21 @@ exports.sendInvite=async(req,res)=>{
         if(!inviteuser){
             return res.status(404).json(errormessage("No User found!"));
         }
+
+        let array1=[
+
+        ]
+
+        let isMatch=await MatchSchema.findOne({users:{$or:[
+            [mongoose.Types.ObjectId(JSON.parse(user)),inviteuser._id],
+            [inviteuser._id,mongoose.Types.ObjectId(JSON.parse(user))]
+        ]}});
+
+        if(isMatch){
+            return res.status(400).json(errormessage("You both have been or are a buddy!"));
+        }
+
+
         let url=`https://sheltered-earth-76230.herokuapp.com/user/${user.buddyid}/invite/${inviteuser.buddyid}`
         let result = await sendInviteEmail(inviteuser.email, inviteuser.username,user,url);
 
