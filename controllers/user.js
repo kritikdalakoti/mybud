@@ -368,10 +368,10 @@ exports.sendInvite=async(req,res)=>{
 
         ]
 
-        let isMatch=await MatchSchema.findOne({users:{$or:[
-            [mongoose.Types.ObjectId(JSON.parse(user)),inviteuser._id],
-            [inviteuser._id,mongoose.Types.ObjectId(JSON.parse(user))]
-        ]}});
+        let isMatch=await MatchSchema.findOne({$or:[
+            {users:[mongoose.Types.ObjectId(JSON.parse(user)),inviteuser._id]},
+            {users:[inviteuser._id,mongoose.Types.ObjectId(JSON.parse(user))]}
+        ]});
 
         if(isMatch){
             return res.status(400).json(errormessage("You both have been or are a buddy!"));
