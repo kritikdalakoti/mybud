@@ -1,10 +1,12 @@
 const User = require('../models/usermodel');
+const MatchSchema=require('../models/match');
+const { v4: uuidv4 } = require('uuid');
 const { generateToken, hashPassword, successmessage, 
-    errormessage, verifypassword, sendEmail ,
-    uploadAws ,allskills 
+    errormessage, verifypassword, sendRegisterEmail ,
+    uploadAws ,allskills,sendInviteEmail 
 } = require('../utils/util');
 const fs=require('fs');
-const { v4: uuidv4 }=require('uuid');
+
 const path=require('path');
 const mongoose = require('mongoose');
 
@@ -53,6 +55,7 @@ exports.UserSignUp = async (req, res) => {
             password: hashedpassword,
             email,
             phoneno,
+            buddyid:uuidv4(),
             confirmationcode
         });
 
@@ -61,7 +64,7 @@ exports.UserSignUp = async (req, res) => {
 
         await user.save();
 
-        let result = await sendEmail(user.email, user.confirmationcode, user.username);
+        let result = await sendRegisterEmail(user.email, user.confirmationcode, user.username);
         console.log(result);
         if (result.error) {
             console.log("Email not sent!")
@@ -150,7 +153,7 @@ exports.resendOTP = async (req, res) => {
         user.confirmationcode = confirmationcode;
         await user.save();
 
-        let result = await sendEmail(user.email, user.confirmationcode, user.username);
+        let result = await sendRegisterEmail(user.email, user.confirmationcode, user.username);
 
         if (result.error) {
             console.log("Email not sent!")
@@ -324,4 +327,78 @@ exports.getfilteredskills=async(req,res)=>{
         res.status(400).json(errormessage(err.message));
     }
 }
+
+exports.searchbuddyid=async(req,res)=>{
+    try{
+        let {buddyid}=req.query;
+        if(!buddyid){
+            return res.status(400).json(errormessage("No buddyid provided!"));
+        }
+
+        let user=await User.findOne({buddyid});
+        if(!user){
+            return res.status(404).json(errormessage("No User found!"));
+        }
+
+        res.status(200).json(successmessage("User found!",user));
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+
+exports.sendInvite=async(req,res)=>{
+    try{
+        let {buddyid}=req.body;
+        let {user}=req;
+
+        user=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
+        if(!buddyid){
+            return res.status(400).json(errormessage("No buddyid provided!"));
+        }
+
+        let inviteuser=await User.findOne({buddyid});
+        console.log(inviteuser);
+        if(!inviteuser){
+            return res.status(404).json(errormessage("No User found!"));
+        }
+        let url=`https://sheltered-earth-76230.herokuapp.com/user/${user.buddyid}/invite/${inviteuser.buddyid}`
+        let result = await sendInviteEmail(inviteuser.email, inviteuser.username,user,url);
+
+        res.status(200).json(successmessage("Invite Sent!"));
+
+    }catch(err){
+        console.log(err.message);
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+
+exports.verifyinvite=async(req,res)=>{
+    try{
+        let user1=await User.findOne({buddyid:req.params.userbuddy});
+        if(!user1){
+            return res.status(200).json(errormessage("User not found!"));
+        }
+        let user2=await User.findOne({buddyid:req.params.recieverbuddy});
+        if(!user2){
+            return res.status(200).json(errormessage("User not found!"));
+        }
+        let users=[
+            user1._id,
+            user2._id
+        ]
+
+        let match=new MatchSchema({
+            users
+        });
+        await match.save();
+        res.status(200).json(successmessage(`Congratulations ${user1.username} is your buddy now!!`));
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+
 

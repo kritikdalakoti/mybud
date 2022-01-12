@@ -91,4 +91,22 @@ router.get(
     Usercontroller.getfilteredskills
 )
 
+router.get(
+    '/searchbuddy',
+    auth,
+    Usercontroller.searchbuddyid
+)
+
+router.post(
+    '/sendinvite',
+    auth,
+    upload.none(),
+    Usercontroller.sendInvite
+)
+
+router.get(
+    '/:userbuddy/invite/:recieverbuddy',
+    Usercontroller.verifyinvite
+)
+
 module.exports = router;

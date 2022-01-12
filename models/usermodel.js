@@ -7,6 +7,7 @@ const UserSchema= new mongoose.Schema({
         trim:true,
         username:true
     },
+    buddyid:String,
     password:{type:String},
     email:{
         type:String,

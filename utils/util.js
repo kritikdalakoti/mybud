@@ -44,7 +44,7 @@ exports.errormessage = (error) => {
   }
 }
 
-exports.sendEmail = async (email, code, username) => {
+exports.sendRegisterEmail = async (email, code, username) => {
 
   let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
   sendSmtpEmail = {
@@ -63,6 +63,37 @@ exports.sendEmail = async (email, code, username) => {
     htmlContent: `<h1>Email Confirmation</h1>
     <h2>Hello ${username}</h2>
     <p>Thank you for subscribing. Your Verification code is ${code}</div>`,
+  }
+
+  try {
+    let res = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    return res;
+  } catch (err) {
+    return this.errormessage(err.message)
+  }
+}
+
+exports.sendInviteEmail = async (email, username, sender,url) => {
+
+  let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+  sendSmtpEmail = {
+    sender: {
+      name: 'MyBud',
+      email: 'noreply@eramcapital.com',
+    },
+    to: [
+      {
+        email,
+        name: username,
+      },
+    ],
+    subject: `Verification Link`,
+
+    htmlContent: `<h1>Buddy Invite</h1>
+    <h2>Hello ${username}</h2>
+    <p>${sender.username} wants to be your Buddy! </p>
+    <a href=${url} >Click Here</a> to accept the invite else ignore
+    </div>`,
   }
 
   try {
