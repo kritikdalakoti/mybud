@@ -84,6 +84,12 @@ exports.getCards = async (req, res) => {
 
         let start = (page - 1) * perpage;
 
+
+        let ismatch=await Match.findOne({users:{$in:[mongoose.Types.ObjectId(JSON.parse(user))]}});
+        console.log(ismatch);
+        if(ismatch){
+           return res.status(200).json(successmessage("Already have a buddy!",[])); 
+        }
         // getting all users current user has left swiped
         let dislikedusers = await Swipe.aggregate([
             { $match: { swipedby: mongoose.Types.ObjectId(JSON.parse(user)), status: 2 } },
@@ -103,6 +109,8 @@ exports.getCards = async (req, res) => {
         console.log(dislikedusers);
 
         let filtered_array = dislikedusers.length?dislikedusers[0].swipedusers:[];
+
+        filtered_array.push(mongoose.Types.ObjectId(JSON.parse(user)));
 
         let findConditions = {
              _id: { $nin: filtered_array } 
