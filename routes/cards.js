@@ -25,7 +25,7 @@ router.get(
     '/getcards1',
     auth,
     upload.none(),
-    cardController.getCards
+    cardController.getCards1
 )
 
 module.exports=router;
