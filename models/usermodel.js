@@ -42,7 +42,15 @@ const UserSchema= new mongoose.Schema({
     ],
     linkedinprofile:String,
     admin:Boolean,
-    location:String
+    location:String,
+    detailscheck:{
+        type:Boolean,
+        default:false
+    },
+    imagecheck:{
+        type:Boolean,
+        default:false
+    }
 })
 
 UserSchema.index({username:1,email:1});

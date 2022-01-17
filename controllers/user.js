@@ -169,7 +169,7 @@ exports.Uploadimage=async(req,res)=>{
     try{
         console.log(req.file);
         if(!req.file){
-            return res.status(400).json(errormessage("Image not provided!"))
+            return res.status(400).json(errormessage("Image not provided!"));
         }
         let filetype=req.file.filename.split('.')[1];
         let data = fs.readFileSync(`${path.join(__dirname, '../uploads/')}${req.file.filename}`);
@@ -192,13 +192,14 @@ exports.Uploadimage=async(req,res)=>{
                 key:result.Key,
                 filename:req.file.filename,
                 location:result.Location
-            }
+            },
+            imagecheck:true
         }
         await User.findOneAndUpdate({_id: mongoose.Types.ObjectId(JSON.parse(req.user)) },{$set:updates});
 
-        // let directory=path.join(__dirname,'../uploads');
-        // deletefiles(directory);
-
+        let directory=path.join(__dirname,'../uploads');
+        deletefiles(directory);
+        
         res.status(200).json(successmessage("File Uploaded Successfuly!"));
 
 
@@ -261,7 +262,8 @@ exports.setdetails=async(req,res)=>{
                 target
             },
             skillsets,
-            linkedinprofile
+            linkedinprofile,
+            detailscheck:true
         }
 
         let user=await User.findOneAndUpdate({_id:mongoose.Types.ObjectId(JSON.parse(req.user))},{$set:updates},{new:true});
