@@ -22,7 +22,7 @@ router.get(
 )
 
 router.get(
-    '/getcards',
+    '/getcards1',
     auth,
     upload.none(),
     cardController.getCards
