@@ -4,13 +4,15 @@ const ChallengeSchema=new mongoose.Schema({
     name:String,
     days:Number,
     counter:[{
-        type:Date
+        type:String
     }],
     userid:mongoose.Types.ObjectId,
     isCompleted:{
         type:Boolean,
         default:false
-    }
+    },
+    createdDate:String,
+    finalDate:String
 },{
     timestamps:true
 })
