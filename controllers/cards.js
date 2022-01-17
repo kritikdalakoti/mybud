@@ -86,9 +86,19 @@ exports.getCards = async (req, res) => {
 
 
         let ismatch=await Match.findOne({users:{$in:[mongoose.Types.ObjectId(JSON.parse(user))]}});
-        console.log(ismatch);
         if(ismatch){
-           return res.status(200).json(successmessage("Already have a buddy!",[])); 
+            console.log(mongoose.Types.ObjectId(JSON.parse(user)));
+            let user1=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
+            let user2=await User.findOne({_id:ismatch.users[0]});
+            let user3=await User.findOne({_id:ismatch.users[1]});
+            let userdetails;
+            if(user1.username===user2.username){
+                userdetails=user3;
+            }else{
+                userdetails=user2;
+            }
+           
+           return res.status(200).json(successmessage("Already have a buddy!",userdetails)); 
         }
         // getting all users current user has left swiped
         let dislikedusers = await Swipe.aggregate([

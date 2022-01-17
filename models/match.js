@@ -9,7 +9,7 @@ const MatchSchema= new Schema({
     timestamps:{type:Date,default:Date.now}
 });
 
-MatchSchema.index({swipedby:1,swipedon:1});
+
 
 module.exports=  mongoose.model("matches",MatchSchema);
 

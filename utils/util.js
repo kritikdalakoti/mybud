@@ -6,8 +6,8 @@ const defaultClient = SibApiV3Sdk.ApiClient.instance;
 var apiKey = defaultClient.authentications['api-key'];
 apiKey.apiKey = process.env.SENDINBLUE_API_KEY;
 var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-const fs=require('fs');
-const path=require('path');
+const fs = require('fs');
+const path = require('path');
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ID,
@@ -73,7 +73,7 @@ exports.sendRegisterEmail = async (email, code, username) => {
   }
 }
 
-exports.sendInviteEmail = async (email, username, sender,url) => {
+exports.sendInviteEmail = async (email, username, sender, url) => {
 
   let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
   sendSmtpEmail = {
@@ -128,12 +128,12 @@ exports.deletefiles = (directory) => {
 
 }
 
-exports.getImage=(params,res)=>{
+exports.getImage = (params, res) => {
 
-  return new Promise((resolve,reject)=>{
-    
+  return new Promise((resolve, reject) => {
+
     s3.getObject(params).createReadStream().on(
-      "error",(error)=>{
+      "error", (error) => {
         reject(error);
       }
     ).pipe(res);
@@ -142,93 +142,123 @@ exports.getImage=(params,res)=>{
 
 }
 
-exports.allskills=[
-"Accounting",
-"Advocacy",
-"Android Programming",
-"Animation",
-"Architect",
-"B2B Sales",
-"B2C Sales",
-"Big Data Analytics",
-"Blockchain",
-"Brand Management",
-"Business Development",
-"Business Law",
-"Canva",
-"Choreography",
-"Client Servicing",
-"Cloud Computing",
-"Coaching",
-"Commercial Law",
-"Communication",
-"Company Law",
-"Content Management",
-"Content Writing",
-"Copywriting",
-"Cyber Law",
-"Data Mining",
-"Digital Marketing",
-"Ecommerce",
-"Editing",
-"Event Management",
-"Financial Planning and Strategy",
-"Forecasting",
-"Fundraising",
-"Game Development",
-"Gaming",
-"GDPR",
-"Graphic Design",
-"Human Resource Management",
-"Illustration Tools",
-"Industrial Law",
-"Influencer Marketing",
-"Information Security",
-"International Marketing",
-"iOS Development",
-"JAVA",
-"Linux",
-"Market Research",
-"Marketing",
-"Negotiation",
-"Network Security",
-"Open Source Development",
-"Painting",
-"People Management",
-"Photography",
-"Photoshop",
-"Presentation Skills",
-"Product Design",
-"Project Management",
-"Proof Reading",
-"Public Relations",
-"Public Speaking",
-"SEO",
-"Smart Contracts",
-"Social Media Marketing",
-"Social Work",
-"Software Engineering",
-"Stock Markets",
-"Storytelling",
-"Supply Management",
-"Tally",
-"Teaching",
-"Time Management",
-"Trading",
-"Travel Planning",
-"UX Design",
-"Video Editing",
-"Video Production",
-"Web Analytics",
-"Web Application Development",
-"Wedding Planning",
-"Yoga",
-"Script Writing",
-"Baking",
-"Cooking",
-"Anchoring",
-"Business Intelligence"
+exports.allskills = [
+  "Accounting",
+  "Advocacy",
+  "Android Programming",
+  "Animation",
+  "Architect",
+  "B2B Sales",
+  "B2C Sales",
+  "Big Data Analytics",
+  "Blockchain",
+  "Brand Management",
+  "Business Development",
+  "Business Law",
+  "Canva",
+  "Choreography",
+  "Client Servicing",
+  "Cloud Computing",
+  "Coaching",
+  "Commercial Law",
+  "Communication",
+  "Company Law",
+  "Content Management",
+  "Content Writing",
+  "Copywriting",
+  "Cyber Law",
+  "Data Mining",
+  "Digital Marketing",
+  "Ecommerce",
+  "Editing",
+  "Event Management",
+  "Financial Planning and Strategy",
+  "Forecasting",
+  "Fundraising",
+  "Game Development",
+  "Gaming",
+  "GDPR",
+  "Graphic Design",
+  "Human Resource Management",
+  "Illustration Tools",
+  "Industrial Law",
+  "Influencer Marketing",
+  "Information Security",
+  "International Marketing",
+  "iOS Development",
+  "JAVA",
+  "Linux",
+  "Market Research",
+  "Marketing",
+  "Negotiation",
+  "Network Security",
+  "Open Source Development",
+  "Painting",
+  "People Management",
+  "Photography",
+  "Photoshop",
+  "Presentation Skills",
+  "Product Design",
+  "Project Management",
+  "Proof Reading",
+  "Public Relations",
+  "Public Speaking",
+  "SEO",
+  "Smart Contracts",
+  "Social Media Marketing",
+  "Social Work",
+  "Software Engineering",
+  "Stock Markets",
+  "Storytelling",
+  "Supply Management",
+  "Tally",
+  "Teaching",
+  "Time Management",
+  "Trading",
+  "Travel Planning",
+  "UX Design",
+  "Video Editing",
+  "Video Production",
+  "Web Analytics",
+  "Web Application Development",
+  "Wedding Planning",
+  "Yoga",
+  "Script Writing",
+  "Baking",
+  "Cooking",
+  "Anchoring",
+  "Business Intelligence"
 ];
+
+exports.challenges = [{
+  Lifestyle: [
+    "Avoid phone & laptop screens for 30 minutes before bed ",
+    "Avoid using mobile & laptop for 30 minutes after waking up",
+    "Read for 20 minutes everyday",
+    "No TV Shows and Movies Streaming",
+    "Compliment someone everyday",
+    "Keep your word",
+    "Wakeup before Sunrise",
+    "Take an outside walk with your mobile",
+    "Write something new everyday(Poem, journal etc)"
+
+  ],
+  Health: [
+    "Eat one fruit daily",
+    "Exercise everyday for 20 minutes or more",
+    "Do not consume chocolate for",
+    "Do not consume junk food",
+    "Walk for 30 minutes everyday",
+    "Consume only vegetarian diet"
+
+  ],
+  Pros: [
+    "Do not complain" ,
+    "Learn a new word everyday" ,
+    "Work on your side hustle continuously", 
+    "No Gossiping"
+  ]
+}]
 
 
 
