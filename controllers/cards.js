@@ -100,9 +100,9 @@ exports.getCards = async (req, res) => {
            
            return res.status(200).json(successmessage("Already have a buddy!",userdetails)); 
         }
-        // getting all users current user has left swiped
+        // getting all users current user has already swiped
         let dislikedusers = await Swipe.aggregate([
-            { $match: { swipedby: mongoose.Types.ObjectId(JSON.parse(user)), status: 2 } },
+            { $match: { swipedby: mongoose.Types.ObjectId(JSON.parse(user))} },
             {
                 $group: {
                     _id: "$swipedby",
