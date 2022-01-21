@@ -45,19 +45,16 @@ exports.storeMessage = async (message, sender, reciever) => {
         created: Date.now
     }
 
+    let arr=[mongoose.Types.ObjectId(reciever),mongoose.Types.ObjectId(sender)];
+
     let findConditions = {
         members: {
-            $or: [[
-                mongoose.Types.ObjectId(sender),
-                mongoose.Types.ObjectId(reciever)
-            ], [
-                mongoose.Types.ObjectId(reciever),
-                mongoose.Types.ObjectId(sender)
-            ]]
+            $in:arr
         }
     }
-
+    console.log('gr we here')
     let isMatch = await Message.findOne(findConditions);
+    console.log('fdbg',isMatch);
     if (!isMatch) {
         let message = new Message({
             members: [mongoose.Types.ObjectId(sender),
