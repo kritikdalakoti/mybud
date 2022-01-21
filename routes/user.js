@@ -4,7 +4,7 @@ const path =require('path');
 const Usercontroller = require('../controllers/user');
 const { auth } = require('../middleware/auth');
 const User = require('../models/usermodel');
-const multer=require('multer')
+const multer=require('multer');
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
@@ -107,6 +107,18 @@ router.post(
 router.get(
     '/:userbuddy/invite/:recieverbuddy',
     Usercontroller.verifyinvite
+)
+
+router.post(
+    '/forgotpassword',
+    upload.none(),
+    Usercontroller.forgotpassword
+)
+
+router.post(
+    '/resetpassword',
+    upload.none(),
+    Usercontroller.resetPassword
 )
 
 module.exports = router;

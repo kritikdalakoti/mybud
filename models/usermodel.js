@@ -50,6 +50,10 @@ const UserSchema= new mongoose.Schema({
     imagecheck:{
         type:Boolean,
         default:false
+    },
+    adminverified:{
+        type:Boolean,
+        default:false
     }
 })
 

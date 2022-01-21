@@ -104,6 +104,38 @@ exports.sendInviteEmail = async (email, username, sender, url) => {
   }
 }
 
+exports.sendForgotEmail = async (email, username) => {
+
+  let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+  sendSmtpEmail = {
+    sender: {
+      name: 'MyBud',
+      email: 'noreply@eramcapital.com',
+    },
+    to: [
+      {
+        email,
+        name: username,
+      },
+    ],
+    subject: `Forgot Password`,
+
+    htmlContent: `<h1>Reset Password</h1>
+    <h2>Hello ${username}</h2>
+    <p>Please click below button to reset your password </p>
+    <a href=${url} ><button>Change your Password</button></a>
+    </div>`,
+  }
+
+  try {
+    let res = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    return res;
+  } catch (err) {
+    return this.errormessage(err.message)
+  }
+}
+
+
 exports.uploadAws = async (params) => {
 
   try {

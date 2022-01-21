@@ -1,13 +1,13 @@
 const User = require('../models/usermodel');
-const MatchSchema=require('../models/match');
+const MatchSchema = require('../models/match');
 const { v4: uuidv4 } = require('uuid');
-const { generateToken, hashPassword, successmessage, 
-    errormessage, verifypassword, sendRegisterEmail ,
-    uploadAws ,allskills,sendInviteEmail 
+const { generateToken, hashPassword, successmessage,
+    errormessage, verifypassword, sendRegisterEmail,
+    uploadAws, allskills, sendInviteEmail, sendForgotEmail
 } = require('../utils/util');
-const fs=require('fs');
+const fs = require('fs');
 
-const path=require('path');
+const path = require('path');
 const mongoose = require('mongoose');
 
 exports.UserSignUp = async (req, res) => {
@@ -24,13 +24,13 @@ exports.UserSignUp = async (req, res) => {
         phoneno = phoneno.trim();
 
         //checking if email exists already and not verified
-        let ismatch = await User.findOne({ email,status:false });
+        let ismatch = await User.findOne({ email, status: false });
         if (ismatch) {
             return res.status(400).json(errormessage("Email already registered! Verify email to continue!"));
         }
 
         //checking if email exists already and verified
-        let ismatch1 = await User.findOne({ email,status:true });
+        let ismatch1 = await User.findOne({ email, status: true });
         if (ismatch1) {
             return res.status(400).json(errormessage("Email already registered and verified! Login to proceed!"));
         }
@@ -55,7 +55,7 @@ exports.UserSignUp = async (req, res) => {
             password: hashedpassword,
             email,
             phoneno,
-            buddyid:uuidv4(),
+            buddyid: uuidv4(),
             confirmationcode
         });
 
@@ -83,7 +83,7 @@ exports.LoginUser = async (req, res) => {
         console.log(req.headers);
         let { username, password } = req.body;
 
-        if(!username||!password){
+        if (!username || !password) {
             return res.status(400).json(errormessage("All fields should be present!"));
         }
 
@@ -119,7 +119,7 @@ exports.verifyCode = async (req, res) => {
     try {
         let { code, email } = req.body;
 
-        if(!code||!email){
+        if (!code || !email) {
             return res.status(400).json(errormessage("All fields must be present!"));
         }
 
@@ -140,7 +140,7 @@ exports.resendOTP = async (req, res) => {
     try {
         let { email } = req.body;
 
-        if(!email){
+        if (!email) {
             return res.status(400).json(errormessage("Email field should be given !"));
         }
 
@@ -165,253 +165,301 @@ exports.resendOTP = async (req, res) => {
     }
 }
 
-exports.Uploadimage=async(req,res)=>{
-    try{
+exports.Uploadimage = async (req, res) => {
+    try {
         console.log(req.file);
-        if(!req.file){
+        if (!req.file) {
             return res.status(400).json(errormessage("Image not provided!"));
         }
-        let filetype=req.file.filename.split('.')[1];
+        let filetype = req.file.filename.split('.')[1];
         let data = fs.readFileSync(`${path.join(__dirname, '../uploads/')}${req.file.filename}`);
-        let uploads={
-            Bucket:process.env.AWS_BUCKET_NAME,
-            Key:`uploads/${uuidv4()}.${filetype}`,
-            Body:data,
-            ContentType:req.file.mimetype,
+        let uploads = {
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: `uploads/${uuidv4()}.${filetype}`,
+            Body: data,
+            ContentType: req.file.mimetype,
             ContentDisposition: 'inline'
         }
 
-        let result=await uploadAws(uploads);
-        if(result.error){
+        let result = await uploadAws(uploads);
+        if (result.error) {
             res.status(500).json(errormessage(result.error));
         }
 
         //update the returned key and location in user database too.
-        let updates={
-            image:{
-                key:result.Key,
-                filename:req.file.filename,
-                location:result.Location
+        let updates = {
+            image: {
+                key: result.Key,
+                filename: req.file.filename,
+                location: result.Location
             },
-            imagecheck:true
+            imagecheck: true
         }
-        await User.findOneAndUpdate({_id: mongoose.Types.ObjectId(JSON.parse(req.user)) },{$set:updates});
+        await User.findOneAndUpdate({ _id: mongoose.Types.ObjectId(JSON.parse(req.user)) }, { $set: updates });
 
-        let directory=path.join(__dirname,'../uploads');
+        let directory = path.join(__dirname, '../uploads');
         deletefiles(directory);
-        
+
         res.status(200).json(successmessage("File Uploaded Successfuly!"));
 
 
-    }catch(err){
+    } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
 }
 
-exports.getUserimage=async(req,res)=>{
-    try{
-        let {user}=req;
-        let {key}=req.query;
+exports.getUserimage = async (req, res) => {
+    try {
+        let { user } = req;
+        let { key } = req.query;
         console.log(key);
-        let result=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
+        let result = await User.findOne({ _id: mongoose.Types.ObjectId(JSON.parse(user)) });
 
-        if(!result){
+        if (!result) {
             return res.status(404).json(errormessage("No user found!"));
         }
 
-        let usernew="";
+        let usernew = "";
 
-        if(key){
-            usernew=await User.findOne({'image.key':key});
+        if (key) {
+            usernew = await User.findOne({ 'image.key': key });
         }
 
         console.log(user)
-        let location=result.image.location?result.image.location:"";
+        let location = result.image.location ? result.image.location : "";
 
-        let data=key?usernew.image.location:location;
+        let data = key ? usernew.image.location : location;
 
-        res.status(200).json(successmessage("Successfuly Fetched",data));
+        res.status(200).json(successmessage("Successfuly Fetched", data));
         // let params={
         //     Key:key?`${key}`:`${result.image.key}` ,
         //     Bucket:process.env.AWS_BUCKET_NAME,
         // }
         // await getImage(params,res);
 
-    }catch(err){
+    } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
 }
 
-exports.setdetails=async(req,res)=>{
-    try{
-        let {profession,details,objective,target,skillsets,linkedinprofile}=req.body;
-        console.log('fdgd',skillsets)
+exports.setdetails = async (req, res) => {
+    try {
+        let { profession, details, objective, target, skillsets, linkedinprofile } = req.body;
+        console.log('fdgd', skillsets)
 
-        if(!profession||!details||!objective||!target||!skillsets||!linkedinprofile){
+        if (!profession || !details || !objective || !target || !skillsets || !linkedinprofile) {
             return res.status(400).json(errormessage("All fields should be given!"));
         }
-        skillsets=skillsets.split(",");
+        skillsets = skillsets.split(",");
         console.log(skillsets);
-        let updates={
-            Info:{
+        let updates = {
+            Info: {
                 profession,
                 details
             },
-            objective:{
-                title:objective,
+            objective: {
+                title: objective,
                 target
             },
             skillsets,
             linkedinprofile,
-            detailscheck:true
+            detailscheck: true
         }
 
-        let user=await User.findOneAndUpdate({_id:mongoose.Types.ObjectId(JSON.parse(req.user))},{$set:updates},{new:true});
-        if(!user){
+        let user = await User.findOneAndUpdate({ _id: mongoose.Types.ObjectId(JSON.parse(req.user)) }, { $set: updates }, { new: true });
+        if (!user) {
             return res.status(400).json(errormessage("Something went wrong!"));
         }
 
-        res.status(200).json(successmessage("Updated Successfuly!",user));
+        res.status(200).json(successmessage("Updated Successfuly!", user));
 
-    }catch(err){
+    } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
 }
 
-exports.getProfile= async (req,res)=>{
-    try{
-        
-        let user=await User.findOne({_id: mongoose.Types.ObjectId(JSON.parse(req.user)) });
-        
-        if(!user){
+exports.getProfile = async (req, res) => {
+    try {
+
+        let user = await User.findOne({ _id: mongoose.Types.ObjectId(JSON.parse(req.user)) });
+
+        if (!user) {
             return res.status(404).json(errormessage("User not found!"));
         }
-        res.status(200).json(successmessage("User Profile",user));
+        res.status(200).json(successmessage("User Profile", user));
 
-    }catch(err){
+    } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
 }
 
-exports.addLocation=async(req,res)=>{
-    try{
-        let {location}=req.body;
-        let {user}=req;
+exports.addLocation = async (req, res) => {
+    try {
+        let { location } = req.body;
+        let { user } = req;
 
-        if(!location){
+        if (!location) {
             return res.status(400).json(errormessage("Provide lOcation!"));
         }
 
-        let updateduser=await User.findOneAndUpdate({_id:JSON.parse((user))},{$set:{location}},{new:true});
-        if(!user){
+        let updateduser = await User.findOneAndUpdate({ _id: JSON.parse((user)) }, { $set: { location } }, { new: true });
+        if (!user) {
             return res.status(400).json(errormessage("Couldn't Update"));
         }
-        res.status(200).json(successmessage("Successfuly Updated!",updateduser));
-    }catch(err){
+        res.status(200).json(successmessage("Successfuly Updated!", updateduser));
+    } catch (err) {
         console.log(err);
         res.status(400).json(errormessage(err.message));
     }
 }
 
-exports.getSkills=(req,res)=>{
-    res.status(200).json(successmessage("all skills",allskills));
+exports.getSkills = (req, res) => {
+    res.status(200).json(successmessage("all skills", allskills));
 }
 
-exports.getfilteredskills=async(req,res)=>{
-    try{
-        let {keyword}=req.query;
-        let skills=allskills;
-        let regtomatch=new RegExp(`^${keyword}.*`,'ig');
-        
-        let filteredskills=skills.filter((skill)=>skill.match(regtomatch)?skill:null );
-        res.status(200).json(successmessage("Filtered Skills",filteredskills));
-    }catch(err){
+exports.getfilteredskills = async (req, res) => {
+    try {
+        let { keyword } = req.query;
+        let skills = allskills;
+        let regtomatch = new RegExp(`^${keyword}.*`, 'ig');
+
+        let filteredskills = skills.filter((skill) => skill.match(regtomatch) ? skill : null);
+        res.status(200).json(successmessage("Filtered Skills", filteredskills));
+    } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
 }
 
-exports.searchbuddyid=async(req,res)=>{
-    try{
-        let {buddyid}=req.query;
-        if(!buddyid){
+exports.searchbuddyid = async (req, res) => {
+    try {
+        let { buddyid } = req.query;
+        if (!buddyid) {
             return res.status(400).json(errormessage("No buddyid provided!"));
         }
 
-        let user=await User.findOne({buddyid});
-        if(!user){
+        let user = await User.findOne({ buddyid });
+        if (!user) {
             return res.status(404).json(errormessage("No User found!"));
         }
 
-        res.status(200).json(successmessage("User found!",user));
+        res.status(200).json(successmessage("User found!", user));
 
-    }catch(err){
+    } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
 }
 
 
-exports.sendInvite=async(req,res)=>{
-    try{
-        let {buddyid}=req.body;
-        let {user}=req;
+exports.sendInvite = async (req, res) => {
+    try {
+        let { buddyid } = req.body;
+        let { user } = req;
 
-        user=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
-        if(!buddyid){
+        user = await User.findOne({ _id: mongoose.Types.ObjectId(JSON.parse(user)) });
+        if (!buddyid) {
             return res.status(400).json(errormessage("No buddyid provided!"));
         }
 
-        let inviteuser=await User.findOne({buddyid});
+        let inviteuser = await User.findOne({ buddyid });
         console.log(inviteuser);
-        if(!inviteuser){
+        if (!inviteuser) {
             return res.status(404).json(errormessage("No User found!"));
         }
 
 
-        let isMatch=await MatchSchema.findOne({$or:[
-            {users:[user._id,inviteuser._id]},
-            {users:[inviteuser._id,user._id]}
-        ]});
+        let isMatch = await MatchSchema.findOne({
+            $or: [
+                { users: [user._id, inviteuser._id] },
+                { users: [inviteuser._id, user._id] }
+            ]
+        });
 
-        if(isMatch){
+        if (isMatch) {
             return res.status(400).json(errormessage("You both have been or are a buddy!"));
         }
 
 
-        let url=`https://sheltered-earth-76230.herokuapp.com/user/${user.buddyid}/invite/${inviteuser.buddyid}`
-        let result = await sendInviteEmail(inviteuser.email, inviteuser.username,user,url);
+        let url = `https://sheltered-earth-76230.herokuapp.com/user/${user.buddyid}/invite/${inviteuser.buddyid}`
+        let result = await sendInviteEmail(inviteuser.email, inviteuser.username, user, url);
 
         res.status(200).json(successmessage("Invite Sent!"));
 
-    }catch(err){
+    } catch (err) {
         console.log(err.message);
         res.status(400).json(errormessage(err.message));
     }
 }
 
 
-exports.verifyinvite=async(req,res)=>{
-    try{
-        let user1=await User.findOne({buddyid:req.params.userbuddy});
-        if(!user1){
+exports.verifyinvite = async (req, res) => {
+    try {
+        let user1 = await User.findOne({ buddyid: req.params.userbuddy });
+        if (!user1) {
             return res.status(200).json(errormessage("User not found!"));
         }
-        let user2=await User.findOne({buddyid:req.params.recieverbuddy});
-        if(!user2){
+        let user2 = await User.findOne({ buddyid: req.params.recieverbuddy });
+        if (!user2) {
             return res.status(200).json(errormessage("User not found!"));
         }
-        let users=[
+        let users = [
             user1._id,
             user2._id
         ]
 
-        let match=new MatchSchema({
+        let match = new MatchSchema({
             users
         });
         await match.save();
         res.status(200).json(successmessage(`Congratulations ${user1.username} is your buddy now!!`));
-    }catch(err){
+    } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
+}
+
+exports.forgotpassword = async (req, res) => {
+    try {
+        let { email } = req.body;
+        if (!email) {
+            return res.status(400).json(successmessage("Email field should be given!"));
+        }
+        let user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json(errormessage("User not found with the given email!"));
+        }
+
+        let url=`https://sheltered-earth-76230.herokuapp.com/user/resetpassword`  // here the url needs to be the frontend url
+        await sendForgotEmail(user.email, user.username);
+        res.status(200).json(successmessage("Reset mail sent! Check your emailid!"));
+
+    } catch (err) {
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+exports.resetPassword = async (req, res) => {
+
+    try {
+        let { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json(errormessage("Provide email or password"));
+        }
+
+        let user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json(errormessage("No user found!"));
+        }
+
+        //hashing the password
+        let hashedpassword = hashPassword(password);
+        let updatedUser = await User.findOneAndUpdate({ email }, { $set: { hashedpassword } }, { new: true });
+        res.status(200).json(successmessage("Password Reset Successful!"));
+    } catch (err) {
+        res.status(400).json(errormessage(err.message));
+    }
+
+
+
 }
 
 

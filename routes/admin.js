@@ -1,6 +1,6 @@
 const {Router}=require('express');
 const {successmessage,errormessage}=require('../utils/util');
-const adminAuth=require('../middleware/admin');
+const {Adminauth}=require('../middleware/admin');
 const AdminController=require('../controllers/admin');
 const router=Router();
 
@@ -18,8 +18,14 @@ router.get(
 
 router.get(
     '/matches',
-    // adminAuth,
+    //Adminauth,
     AdminController.getmatches
+)
+
+router.post(
+    '/userverify',
+    //Adminauth,
+    AdminController.UserVerify
 )
 
 module.exports=router;

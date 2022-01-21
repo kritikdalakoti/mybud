@@ -18,7 +18,7 @@ exports.getAllUsers = async (req, res) => {
         page = parseInt(page);
         let start = (page - 1) * perpage;
 
-        let users = await User.find({}).sort({ _id: -1 }).skip(start).limit(perpage);
+        let users = await User.find({status:true}).sort({ _id: -1 }).skip(start).limit(perpage);
         res.status(200).json(successmessage("All Users", users));
 
     } catch (err) {
@@ -65,6 +65,23 @@ exports.getmatches = async (req, res) => {
         res.status(200).json(successmessage("user Details", matches));
 
     } catch (err) {
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+
+exports.UserVerify=async(req,res)=>{
+    try{
+        let{user,status}=req.body;
+        if(status){
+            let user1=await User.findOneAndUpdate({_id:mongoose.Types.ObjectId(user)},{$set:{adminverified:true}},{new:true});
+            return res.status(200).json(successmessage("Verified Successfuly!",user1));
+        }
+
+        let user1=await User.findOneAndDelete({_id:mongoose.Types.ObjectId(user)});
+        res.status(200).json(errormessage("Successfuly Removed User!",user1));
+        
+    }catch(err){
         res.status(400).json(errormessage(err.message));
     }
 }
