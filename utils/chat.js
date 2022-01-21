@@ -42,7 +42,7 @@ exports.storeMessage = async (message, sender, reciever) => {
         sender: mongoose.Types.ObjectId(sender),
         reciever: mongoose.Types.ObjectId(reciever),
         message,
-        created: Date.now
+        created: Date.now()
     }
 
     let arr=[mongoose.Types.ObjectId(reciever),mongoose.Types.ObjectId(sender)];
