@@ -66,8 +66,11 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('privatemessage',async({user1,user2,message})=>{
+		console.log('inside',user1,user2,message);
 			let socketdata=await SocketModel.findOne({userid:mongoose.Types.ObjectId(user2)});
+			console.log('inside2',socketdata);
 			socket.to(socketdata.socketid).emit('privatemessage',message);
+			console.log('gfhgfgfg');
 			await storeMessage(message, user1, user2);
 	})
 
