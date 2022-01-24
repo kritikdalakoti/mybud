@@ -98,9 +98,10 @@ io.on('connection', (socket) => {
 
 	// when one user unmatched the other
 	socket.on('disconnect', async function (roomid) {
-		console.log(' user unmatched ');
-		await userunmatched(roomid);
-		socket.broadcast.to(roomid).emit("userunmatched");
+		console.log('disconnected')
+		// console.log(' user unmatched ');
+		// await userunmatched(roomid);
+		// socket.broadcast.to(roomid).emit("userunmatched");
 	});
 })
 
