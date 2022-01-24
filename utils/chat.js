@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Message = require('../models/chat');
+const Socket=require('../models/socket');
 const { successmessage, errormessage } = require('../utils/util');
 
 
@@ -71,6 +72,15 @@ exports.storeMessage = async (message, sender, reciever) => {
     await Message.findOneAndUpdate(findConditions, { $push: { messages: updates } });
 }
 
-exports.userunmatched = async (roomid) => {
-    await Message.findOneAndDelete({ roomid });
+exports.getMessages=async(userid)=>{
+    let userid=mongoose.Types.ObjectId(userid);
+    let userchats=await Message.findOne({members:{$in:[userid]}});
+    if(userchats){
+        return userchats.messages
+    }
+    return [];
+}
+
+exports.deleteSocket = async (socketid) => {
+    await Socket.findOneAndDelete({socketid});
 }

@@ -6,9 +6,9 @@ const cors = require('cors');
 require('dotenv').config();
 const http = require('http');
 const socketio = require('socket.io');
-let { checkroom, addinroom, storeMessage,userunmatched } = require('./utils/chat');
-const User=require('./models/usermodel');
-const SocketModel=require('./models/socket');
+let { storeMessage, deleteSocket,getMessages } = require('./utils/chat');
+const User = require('./models/usermodel');
+const SocketModel = require('./models/socket');
 const { Socket } = require('dgram');
 
 const server = http.createServer(app);
@@ -20,9 +20,9 @@ app.use(cors({ limit: '50mb' }));
 // Importing Routes
 app.use('/user', require('./routes/user'));
 app.use('/card', require('./routes/cards'));
-app.use('/task',require('./routes/task'));
-app.use('/admin',require('./routes/admin'));
-app.use('/challenge',require('./routes/challenges'));
+app.use('/task', require('./routes/task'));
+app.use('/admin', require('./routes/admin'));
+app.use('/challenge', require('./routes/challenges'));
 
 
 // Importing Scripts
@@ -49,29 +49,32 @@ io.on('connection', (socket) => {
 
 
 	// whenever someone joins store or update their socketid in database
-	socket.on('updatesocketid',async(userid)=>{
-		let isMatch=await SocketModel.findOne({userid:mongoose.Types.ObjectId(userid)});
-		if(!isMatch){
-			let socketdata=new SocketModel({
-				userid:mongoose.Types.ObjectId(userid),
-				socketid:socket.id
+	socket.on('updatesocketid', async (userid) => {
+		let isMatch = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(userid) });
+		if (!isMatch) {
+			let socketdata = new SocketModel({
+				userid: mongoose.Types.ObjectId(userid),
+				socketid: socket.id
 			})
 			await socketdata.save();
-		}else{
-			let updates={
-				socketid:socket.id
+		} else {
+			let updates = {
+				socketid: socket.id
 			}
-			await SocketModel.findOneAndUpdate({userid:mongoose.Types.ObjectId(userid)},{$set:updates});
+			await SocketModel.findOneAndUpdate({ userid: mongoose.Types.ObjectId(userid) }, { $set: updates });
 		}
+		let messages=await getMessages(userid);
+		socket.emit('messages',messages);
+
 	})
 
-	socket.on('privatemessage',async({user1,user2,message})=>{
-		console.log('inside',user1,user2,message);
-			let socketdata=await SocketModel.findOne({userid:mongoose.Types.ObjectId(user2)});
-			console.log('inside2',socketdata);
-			socket.to(socketdata.socketid).emit('privatemessage',message);
-			console.log('gfhgfgfg');
-			await storeMessage(message, user1, user2);
+	socket.on('privatemessage', async ({ user1, user2, message }) => {
+		console.log('inside', user1, user2, message);
+		await storeMessage(message, user1, user2);
+		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user2) });
+		if(socketdata){
+			socket.to(socketdata.socketid).emit('privatemessage', message);
+		}
 	})
 
 
@@ -97,11 +100,9 @@ io.on('connection', (socket) => {
 	// })
 
 	// when one user unmatched the other
-	socket.on('disconnect', async function (roomid) {
-		console.log('disconnected')
-		// console.log(' user unmatched ');
-		// await userunmatched(roomid);
-		// socket.broadcast.to(roomid).emit("userunmatched");
+	socket.on('disconnect', async function () {
+		console.log('disconnected');
+		await deleteSocket(socket.id);
 	});
 })
 
