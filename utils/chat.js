@@ -73,7 +73,7 @@ exports.storeMessage = async (message, sender, reciever) => {
 }
 
 exports.getMessages=async(userid)=>{
-    let userid=mongoose.Types.ObjectId(userid);
+    userid=mongoose.Types.ObjectId(userid);
     let userchats=await Message.findOne({members:{$in:[userid]}});
     if(userchats){
         return userchats.messages

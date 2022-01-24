@@ -6,7 +6,7 @@ const cors = require('cors');
 require('dotenv').config();
 const http = require('http');
 const socketio = require('socket.io');
-let { storeMessage, deleteSocket,getMessages } = require('./utils/chat');
+let { storeMessage, deleteSocket, getMessages } = require('./utils/chat');
 const User = require('./models/usermodel');
 const SocketModel = require('./models/socket');
 const { Socket } = require('dgram');
@@ -63,8 +63,8 @@ io.on('connection', (socket) => {
 			}
 			await SocketModel.findOneAndUpdate({ userid: mongoose.Types.ObjectId(userid) }, { $set: updates });
 		}
-		let messages=await getMessages(userid);
-		socket.emit('messages',messages);
+		let messages = await getMessages(userid); //getting messages of the user who has joined .
+		socket.emit('messages', messages);
 
 	})
 
@@ -72,7 +72,7 @@ io.on('connection', (socket) => {
 		console.log('inside', user1, user2, message);
 		await storeMessage(message, user1, user2);
 		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user2) });
-		if(socketdata){
+		if (socketdata) { // if only one is online then only send him the message otherwise just store his messages.
 			socket.to(socketdata.socketid).emit('privatemessage', message);
 		}
 	})
@@ -99,9 +99,9 @@ io.on('connection', (socket) => {
 	// 	socket.broadcast.to(roomid).emit('message', message);
 	// })
 
-	// when one user unmatched the other
 	socket.on('disconnect', async function () {
 		console.log('disconnected');
+	    // when user goes offline delete his socketid from db so that we can know which user is online or offline
 		await deleteSocket(socket.id);
 	});
 })
