@@ -87,3 +87,24 @@ exports.getUserchallenges=async(req,res)=>{
         res.status(400).json(errormessage(err.message));
     }
 }
+
+exports.getAttendence=async(req,res)=>{
+    try{
+        let {name}=req.body;
+        let {user}=req;
+        user=mongoose.Types.ObjectId( JSON.parse(user));
+
+        if(!name){
+            return res.status(400).json("Provide Challenge Name!");
+        }
+
+        let challenge=await Challenge.findOne({name,userid:user});
+        if(!challenge){
+            return res.status(200).json(successmessage("No data found with this user"));
+        }
+        res.status(200).json(successmessage("Challenge Attendence",challenge.counter));
+
+    }catch(err){
+        res.status(200).json(errormessage(err.message));
+    }
+}

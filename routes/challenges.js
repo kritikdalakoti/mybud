@@ -32,4 +32,11 @@ router.get(
     controller.getUserchallenges
 )
 
+router.post(
+    '/getattendence',
+    auth,
+    upload.none(),
+    controller.getAttendence
+)
+
 module.exports=router;
