@@ -9,6 +9,8 @@ var apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 const fs = require('fs');
 const path = require('path');
 
+const Chats = require('../models/chat');
+
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ID,
   secretAccessKey: process.env.AWS_SECRET,
@@ -285,28 +287,74 @@ exports.challenges = [{
 
   ],
   Pros: [
-    "Do not complain" ,
-    "Learn a new word everyday" ,
-    "Work on your side hustle continuously", 
+    "Do not complain",
+    "Learn a new word everyday",
+    "Work on your side hustle continuously",
     "No Gossiping"
   ]
 }]
 
 
-exports.todayDate=(date2)=>{
-  let date = date2?date2: new Date();
-	const year = date.getFullYear();
-	let month;
-	if (date.getMonth() + 1 >= 10) {
-		month = `${date.getMonth() + 1}`;
-	} else {
-		month = `0${date.getMonth() + 1}`;
-	}
-	let date1 = date.getDate();
-	if (date1 < 10) {
-		date1 = `0${date1}`;
-	}
-	return `${year}-${month}-${date1}`;
+exports.todayDate = (date2) => {
+  let date = date2 ? date2 : new Date();
+  const year = date.getFullYear();
+  let month;
+  if (date.getMonth() + 1 >= 10) {
+    month = `${date.getMonth() + 1}`;
+  } else {
+    month = `0${date.getMonth() + 1}`;
+  }
+  let date1 = date.getDate();
+  if (date1 < 10) {
+    date1 = `0${date1}`;
+  }
+  return `${year}-${month}-${date1}`;
+}
+
+exports.checkValidmatch = async (matches) => {
+
+  let tobefiltered = await Promise.all(matches.map(async match => {
+    let chats = await Chats.findOne({ members: [...match.users] });
+    if (!chats) {
+      return null
+    }
+    let set = new Set([]);
+    if (chats.messages.length >= 2) {
+      chats.messages.map(chat => {
+        set.add(chat.sender);
+      })
+    }
+    // return set.size;
+    // console.log('df', set.size);
+    if (set.size > 1) {
+      console.log(1);
+      return match;
+    }else{
+      return null
+    }
+  }))
+  console.log(tobefiltered)
+
+  return tobefiltered.filter(match=>match);
+
+  // let res = matches.filter(async match => {
+  //   let chats = await Chats.findOne({ members: [...match.users] });
+  //   if (!chats) {
+  //     return
+  //   }
+  //   let set = new Set([]);
+  //   if (chats.messages.length >= 2) {
+  //     chats.messages.map(chat => {
+  //       set.add(chat.sender);
+  //     })
+  //   }
+  //   // console.log('df', set.size);
+  //   if (set.size > 1) {
+  //     console.log(1);
+  //     return match;
+  //   }
+  //})
+  //return res;
 }
 
 

@@ -1,7 +1,7 @@
 const Swipe = require('../models/swipemodel');
 const Match = require('../models/match');
 const User = require('../models/usermodel');
-const { successmessage, errormessage } = require('../utils/util');
+const { successmessage, errormessage,checkValidmatch } = require('../utils/util');
 const mongoose = require('mongoose');
 
 exports.swipecard = async (req, res) => {
@@ -80,17 +80,17 @@ exports.getCards = async (req, res) => {
         }
 
         page = parseInt(page);
-        
 
         let start = (page - 1) * perpage;
-
-
-        let ismatch=await Match.findOne({users:{$in:[mongoose.Types.ObjectId(JSON.parse(user))]}});
-        if(ismatch){
+        let ismatch=await Match.find({users:{$in:[mongoose.Types.ObjectId(JSON.parse(user))]}});
+        let isres=await checkValidmatch(ismatch);
+        console.log('das',isres);
+        // console.log(user);
+        if(isres.length){
             console.log(mongoose.Types.ObjectId(JSON.parse(user)));
             let user1=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
-            let user2=await User.findOne({_id:ismatch.users[0]});
-            let user3=await User.findOne({_id:ismatch.users[1]});
+            let user2=await User.findOne({_id:isres[0].users[0]});
+            let user3=await User.findOne({_id:isres[0].users[1]});
             let userdetails;
             if(user1.username===user2.username){
                 userdetails=user3;
