@@ -28,6 +28,13 @@ router.get(
     cardController.getCards1
 )
 
+router.get(
+    '/savedcards',
+    auth,
+    upload.none(),
+    cardController.savecard
+)
+
 module.exports=router;
 
 

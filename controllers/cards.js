@@ -3,6 +3,7 @@ const Match = require('../models/match');
 const User = require('../models/usermodel');
 const { successmessage, errormessage,checkValidmatch } = require('../utils/util');
 const mongoose = require('mongoose');
+const swipemodel = require('../models/swipemodel');
 
 exports.swipecard = async (req, res) => {
     try {
@@ -31,8 +32,8 @@ exports.swipecard = async (req, res) => {
 
         // check if it is a match
 
-        if (status == 1 || status == 3) {  // meaning the user liked or superliked
-            let match = await Swipe.findOne({ swipedon: swipedby, swipedby: swipedon, status: { $in: [1, 3] } });
+        if (status === 1 ) {  // meaning the user liked 
+            let match = await Swipe.findOne({ swipedon: swipedby, swipedby: swipedon, status: 1 });
             if (match) {
                 let users = [swipedon, swipedby];
                 let newmatch = new Match({
@@ -266,4 +267,31 @@ exports.getCards1 = async (req, res) => {
 } catch (err) {
     res.status(400).json(errormessage(err.message));
 }
+}
+
+exports.savecard=async(req,res)=>{
+    try{
+        let {user}=req;
+        user=mongoose.Types.ObjectId(JSON.parse(user));
+
+        let cards=await swipemodel.aggregate([
+            {$match:{swipedby:user,status:3}},
+            {$lookup:{
+                from:'users',
+                localField:'swipedon',
+                foreignField:'_id',
+                as:'card_details'
+            }},
+            {
+                $project:{
+                    result:"$card_details"
+                }
+            }
+        ]).allowDiskUse(true);
+
+        res.status(200).json(successmessage("Saved Cards",cards));
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
 }
