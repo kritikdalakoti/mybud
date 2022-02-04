@@ -101,6 +101,24 @@ exports.getCards = async (req, res) => {
            
            return res.status(200).json(successmessage("Already have a buddy!",userdetails)); 
         }
+
+        if(ismatch.length!==0){
+            console.log(mongoose.Types.ObjectId(JSON.parse(user)));
+            let userdetails=[];
+            ismatch.map( async match=>{
+                let user1=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
+                let user2=await User.findOne({_id:match.users[0]});
+                let user3=await User.findOne({_id:match.users[1]});
+                
+                if(user1.username===user2.username){
+                    userdetails.push(user1);
+                }else{
+                    userdetails.push(user2);
+                }
+            })
+           return res.status(200).json(successmessage("You have a buddy!",userdetails)); 
+        }
+
         // getting all users current user has already swiped
         let dislikedusers = await Swipe.aggregate([
             { $match: { swipedby: mongoose.Types.ObjectId(JSON.parse(user))} },
@@ -202,6 +220,9 @@ exports.getCards1 = async (req, res) => {
            
            return res.status(200).json(successmessage("Already have a buddy!",userdetails)); 
         }
+
+
+        
         // getting all users current user has left swiped
         let dislikedusers = await Swipe.aggregate([
             { $match: { swipedby: mongoose.Types.ObjectId(JSON.parse(user)), status: 2 } },
