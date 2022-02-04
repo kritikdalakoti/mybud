@@ -101,10 +101,11 @@ exports.getCards = async (req, res) => {
            
            return res.status(200).json(successmessage("Already have a buddy!",userdetails)); 
         }
+        let userdetails=[];
 
         if(ismatch.length!==0){
             console.log(mongoose.Types.ObjectId(JSON.parse(user)));
-            let userdetails=[];
+            
             ismatch.map( async match=>{
                 let user1=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
                 let user2=await User.findOne({_id:match.users[0]});
@@ -115,8 +116,9 @@ exports.getCards = async (req, res) => {
                 }else{
                     userdetails.push(user2);
                 }
+                console.log('e',userdetails)
             })
-           return res.status(200).json(successmessage("You have a buddy!",userdetails)); 
+        //    return res.status(200).json(successmessage("You have a buddy!",userdetails)); 
         }
 
         // getting all users current user has already swiped
@@ -175,8 +177,11 @@ exports.getCards = async (req, res) => {
         data: eligibleusers,
         count: totalNumber,
         page:page,
-        success: true
+        success: true,
+        isBuddy:userdetails.length>0?true:false,
+        buddydetails:userdetails
     }
+    console.log('ef',result)
 
     res.status(200).json(result);
 
