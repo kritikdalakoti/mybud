@@ -54,53 +54,53 @@ const checkchats = async () => {
     let date2 = new Date();
     console.log(date - date2);
 
-    let results=await Match.aggregate([
+    let results = await Match.aggregate([
         {
             $project: {
-                users:"$users",
+                users: "$users",
                 createdAt: "$createdAt",
                 nextday: {
                     $add:
-                    [
-                        "$createdAt",
-                        60*1000
-                    ]
+                        [
+                            "$createdAt",
+                            24 * 60 * 60000
+                        ]
                 },
-                today:new Date()
+                today: new Date()
             }
         },
         {
-            $project:{
-                check:{$subtract:["$today","$nextday"]},
-                users:1
+            $project: {
+                check: { $subtract: ["$today", "$nextday"] },
+                users: 1
             }
         },
-        {$match:{check:{$gt:0}}}
+        { $match: { check: { $gt: 0 } } }
     ]).allowDiskUse(true);
     console.log(results)
-    let filteredresults=results.filter(async res=>{
-        let chats=await Chats.findOne({members:{$in:res.users}});
-        if(chats){
-            let set=new Set([]);
-            if(chats.messages.length>=2){
-                chats.messages.map(chat=>{
+    let filteredresults = results.filter(async res => {
+        let chats = await Chats.findOne({ members: { $in: res.users } });
+        if (chats) {
+            let set = new Set([]);
+            if (chats.messages.length >= 2) {
+                chats.messages.map(chat => {
                     set.add(chat.sender);
                 })
             }
-            if(set.size()===1){
+            if (set.size() === 1) {
                 return res;
             }
         }
     });
 
-    filteredresults.map(async res=>{
-        await Match.findOneAndDelete({users:{$in:res.users}});
-        await Chats.findOneAndDelete({members:{$in:res.users}});
+    filteredresults.map(async res => {
+        await Match.findOneAndDelete({ users: { $in: res.users } });
+        await Chats.findOneAndDelete({ members: { $in: res.users } });
     })
 
 }
 
-cron.schedule('0 */02 * * * *',checkchats);
+// cron.schedule('0 */30 * * * *',checkchats);
 // checkchats();
 // checkcompletedChallenges();
 //  hello();
