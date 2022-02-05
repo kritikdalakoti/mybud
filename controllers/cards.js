@@ -85,10 +85,11 @@ exports.getCards = async (req, res) => {
         let start = (page - 1) * perpage;
         let ismatch=await Match.find({users:{$in:[mongoose.Types.ObjectId(JSON.parse(user))]}});
         let isres=await checkValidmatch(ismatch);
-        console.log('das',isres);
+        // console.log('das',isres);
         // console.log(user);
+        console.log(mongoose.Types.ObjectId(JSON.parse(user)));
         if(isres.length){
-            console.log(mongoose.Types.ObjectId(JSON.parse(user)));
+            
             let user1=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
             let user2=await User.findOne({_id:isres[0].users[0]});
             let user3=await User.findOne({_id:isres[0].users[1]});
@@ -105,19 +106,23 @@ exports.getCards = async (req, res) => {
 
         if(ismatch.length!==0){
             console.log(mongoose.Types.ObjectId(JSON.parse(user)));
+
+            await Promise.all(
+                ismatch.map( async match=>{
+                    let user1=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
+                    let user2=await User.findOne({_id:match.users[0]});
+                    let user3=await User.findOne({_id:match.users[1]});
+                    
+                    if(user1.username===user2.username){
+                        userdetails.push(user3);
+                    }else{
+                        userdetails.push(user2);
+                    }
+                    console.log('e',userdetails)
+                })
+            )
             
-            ismatch.map( async match=>{
-                let user1=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
-                let user2=await User.findOne({_id:match.users[0]});
-                let user3=await User.findOne({_id:match.users[1]});
-                
-                if(user1.username===user2.username){
-                    userdetails.push(user1);
-                }else{
-                    userdetails.push(user2);
-                }
-                console.log('e',userdetails)
-            })
+            
         //    return res.status(200).json(successmessage("You have a buddy!",userdetails)); 
         }
 
@@ -137,7 +142,7 @@ exports.getCards = async (req, res) => {
             }
         ]).allowDiskUse(true);
 
-        console.log(dislikedusers);
+        // console.log(dislikedusers);
 
         let filtered_array = dislikedusers.length?dislikedusers[0].swipedusers:[];
 
@@ -171,7 +176,7 @@ exports.getCards = async (req, res) => {
     ]).allowDiskUse(true);
 
     let totalNumber = eligibleusers.length;
-
+    console.log('dsfdf',userdetails)
     let result = {
         message: 'File List Page Number ' + page,
         data: eligibleusers,
@@ -181,7 +186,7 @@ exports.getCards = async (req, res) => {
         isBuddy:userdetails.length>0?true:false,
         buddydetails:userdetails
     }
-    console.log('ef',result)
+    // console.log('ef',result)
 
     res.status(200).json(result);
 
