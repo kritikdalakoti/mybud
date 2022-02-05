@@ -59,26 +59,25 @@ const checkchats = async () => {
             $project: {
                 users:"$users",
                 createdAt: "$createdAt",
-                next: {
-                    $dateAdd:
-                    {
-                        startDate: "$createdAt",
-                        unit: "day",
-                        amount: 1
-                    }
+                nextday: {
+                    $add:
+                    [
+                        "$createdAt",
+                        60*1000
+                    ]
                 },
                 today:new Date()
             }
         },
         {
             $project:{
-                check:{$subtract:["$today","$next"]},
+                check:{$subtract:["$today","$nextday"]},
                 users:1
             }
         },
         {$match:{check:{$gt:0}}}
     ]).allowDiskUse(true);
-
+    console.log(results)
     let filteredresults=results.filter(async res=>{
         let chats=await Chats.findOne({members:{$in:res.users}});
         let set=new Set([]);
@@ -98,6 +97,8 @@ const checkchats = async () => {
     })
 
 }
+
+cron.schedule('0 */02 * * * *',checkchats);
 // checkchats();
 // checkcompletedChallenges();
 //  hello();
