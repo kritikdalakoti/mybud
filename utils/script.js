@@ -80,14 +80,16 @@ const checkchats = async () => {
     console.log(results)
     let filteredresults=results.filter(async res=>{
         let chats=await Chats.findOne({members:{$in:res.users}});
-        let set=new Set([]);
-        if(chats.messages.length>=2){
-            chats.messages.map(chat=>{
-                set.add(chat.sender);
-            })
-        }
-        if(set.size()===1){
-            return res;
+        if(chats){
+            let set=new Set([]);
+            if(chats.messages.length>=2){
+                chats.messages.map(chat=>{
+                    set.add(chat.sender);
+                })
+            }
+            if(set.size()===1){
+                return res;
+            }
         }
     });
 
