@@ -85,7 +85,7 @@ exports.getCards = async (req, res) => {
         let start = (page - 1) * perpage;
         let ismatch=await Match.find({users:{$in:[mongoose.Types.ObjectId(JSON.parse(user))]}});
         let isres=await checkValidmatch(ismatch);
-        // console.log('das',isres);
+        console.log('das',isres);
         // console.log(user);
         console.log(mongoose.Types.ObjectId(JSON.parse(user)));
         if(isres.length){
