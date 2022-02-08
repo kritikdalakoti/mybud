@@ -327,3 +327,28 @@ exports.savecard=async(req,res)=>{
         res.status(400).json(errormessage(err.message));
     }
 }
+
+exports.setmatchtime=async(req,res)=>{
+    try{
+        // let {user}=req;
+        // user=mongoose.Types.ObjectId(JSON.parse(user));
+        let {matchid,time}=req.body;
+        if(!matchid||!time){
+            return res.status(400).json(errormessage("All fields should be present!"));
+        }
+
+        matchid=mongoose.Types.ObjectId(matchid);
+        let updates={
+            time
+        }
+        let updatedMatch=await Match.findOneAndUpdate({_id:matchid},updates,{new:true});
+        if(!updatedMatch){
+            return res.status(400).json(errormessage("Couldn't update!"));
+        }
+        res.status(200).json(successmessage("Time set successfuly",updatedMatch));
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+

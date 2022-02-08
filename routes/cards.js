@@ -35,6 +35,13 @@ router.get(
     cardController.savecard
 )
 
+router.post(
+    '/setmatchtime',
+    auth,
+    upload.none(),
+    cardController.setmatchtime
+)
+
 module.exports=router;
 
 
