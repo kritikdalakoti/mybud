@@ -338,7 +338,7 @@ exports.setmatchtime=async(req,res)=>{
         }
 
         matchid=mongoose.Types.ObjectId(matchid);
-
+        time=new Date(time);
         let temptime=time;
         let finaltime=temptime.setHours(temptime.getHours()+24);
 
@@ -368,12 +368,12 @@ exports.getMatchesTime=async(req,res)=>{
         let results=await Promise.all(matches.map(match=>{
             let result={
                 matchid:match._id,
-                timeleft:match.time-new Date()
+                timeleft:match.time-new Date(),
+                hoursleft:Math.ceil((match.time-new Date())/3600000)  
             }
             return result
         }));
-        console.log(results);
-        let filteredresults=results.filter(res=>res.temp>0);
+        let filteredresults=results.filter(res=>res.timeleft>0);
         res.status(200).json(successmessage("Match Time",filteredresults));
 
     }catch(err){
