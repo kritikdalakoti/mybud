@@ -338,14 +338,43 @@ exports.setmatchtime=async(req,res)=>{
         }
 
         matchid=mongoose.Types.ObjectId(matchid);
+
+        let temptime=time;
+        let finaltime=temptime.setHours(temptime.getHours()+24);
+
         let updates={
-            time
+            time,
+            finaltime
         }
+
         let updatedMatch=await Match.findOneAndUpdate({_id:matchid},updates,{new:true});
         if(!updatedMatch){
             return res.status(400).json(errormessage("Couldn't update!"));
         }
         res.status(200).json(successmessage("Time set successfuly",updatedMatch));
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}
+
+exports.getMatchesTime=async(req,res)=>{
+    try{
+        let {user}=req;
+        user=mongoose.Types.ObjectId(JSON.parse(user));
+
+        let matches=await Match.find({users:{$in:[user]}});
+        console.log('dvd',matches);
+        let results=await Promise.all(matches.map(match=>{
+            let result={
+                matchid:match._id,
+                timeleft:match.time-new Date()
+            }
+            return result
+        }));
+        console.log(results);
+        let filteredresults=results.filter(res=>res.temp>0);
+        res.status(200).json(successmessage("Match Time",filteredresults));
 
     }catch(err){
         res.status(400).json(errormessage(err.message));

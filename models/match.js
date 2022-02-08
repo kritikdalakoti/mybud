@@ -8,6 +8,9 @@ const MatchSchema= new Schema({
     time:{
         type:Date,
         default:Date.now
+    },
+    finaltime:{
+        type:Date
     }
 },{
     timestamps:{type:Date,default:Date.now}

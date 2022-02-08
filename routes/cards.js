@@ -42,6 +42,12 @@ router.post(
     cardController.setmatchtime
 )
 
+router.get(
+    '/getmatchtime',
+    auth,
+    cardController.getMatchesTime
+)
+
 module.exports=router;
 
 
