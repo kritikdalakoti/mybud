@@ -106,7 +106,7 @@ exports.sendInviteEmail = async (email, username, sender, url) => {
   }
 }
 
-exports.sendForgotEmail = async (email, username) => {
+exports.sendForgotEmail = async (email, username,code) => {
 
   let sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
   sendSmtpEmail = {
@@ -124,8 +124,7 @@ exports.sendForgotEmail = async (email, username) => {
 
     htmlContent: `<h1>Reset Password</h1>
     <h2>Hello ${username}</h2>
-    <p>Please click below button to reset your password </p>
-    <a href=${url} ><button>Change your Password</button></a>
+    p> OTP to reset your password is ${code},
     </div>`,
   }
 

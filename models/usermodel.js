@@ -54,7 +54,8 @@ const UserSchema= new mongoose.Schema({
     adminverified:{
         type:Boolean,
         default:false
-    }
+    },
+    forgetpasscode:String
 })
 
 UserSchema.index({username:1,email:1});

@@ -6,7 +6,7 @@ const { generateToken, hashPassword, successmessage,
     uploadAws, allskills, sendInviteEmail, sendForgotEmail
 } = require('../utils/util');
 const fs = require('fs');
- 
+
 const path = require('path');
 const mongoose = require('mongoose');
 
@@ -117,13 +117,22 @@ exports.LoginUser = async (req, res) => {
 
 exports.verifyCode = async (req, res) => {
     try {
-        let { code, email } = req.body;
+        let { code, email, type } = req.body;
 
-        if (!code || !email) {
+        if (!code || !email || !type) {
             return res.status(400).json(errormessage("All fields must be present!"));
         }
 
-        let user = await User.findOne({ email, confirmationcode: code });
+        let findConditions = {
+            email
+        };
+        if (type === "forgotpassword") {
+            findConditions['forgetpasscode'] = code;
+        } else {
+            findConditions['confirmationcode'] = code;
+        }
+
+        let user = await User.findOne(findConditions);
         if (!user) {
             return res.status(404).json(errormessage("Not Valid code!"));
         }
@@ -426,9 +435,10 @@ exports.forgotpassword = async (req, res) => {
         if (!user) {
             return res.status(400).json(errormessage("User not found with the given email!"));
         }
-
-        let url=`https://sheltered-earth-76230.herokuapp.com/user/resetpassword`  // here the url needs to be the frontend url
-        await sendForgotEmail(user.email, user.username);
+        let confirmationcode = Math.floor(1000 + Math.random() * 9000);
+        user.forgetpasscode = confirmationcode;
+        await sendForgotEmail(user.email, user.username, confirmationcode);
+        await user.save();
         res.status(200).json(successmessage("Reset mail sent! Check your emailid!"));
 
     } catch (err) {
@@ -452,8 +462,8 @@ exports.resetPassword = async (req, res) => {
 
         //hashing the password
         let hashedpassword = hashPassword(password);
-        let updatedUser = await User.findOneAndUpdate({ email }, { $set: { hashedpassword } }, { new: true });
-        res.status(200).json(successmessage("Password Reset Successful!"));
+        let updatedUser = await User.findOneAndUpdate({ email }, { $set: { password: hashedpassword } }, { new: true });
+        res.status(200).json(successmessage("Password Reset Successful!", updatedUser));
     } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
