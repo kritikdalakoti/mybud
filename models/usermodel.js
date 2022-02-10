@@ -55,7 +55,8 @@ const UserSchema= new mongoose.Schema({
         type:Boolean,
         default:false
     },
-    forgetpasscode:String
+    forgetpasscode:String,
+    fcmtoken:String
 })
 
 UserSchema.index({username:1,email:1});

@@ -5,6 +5,7 @@ const { generateToken, hashPassword, successmessage,
     errormessage, verifypassword, sendRegisterEmail,
     uploadAws, allskills, sendInviteEmail, sendForgotEmail
 } = require('../utils/util');
+const {sendNotification}=require('../utils/notification');
 const fs = require('fs');
 
 const path = require('path');
@@ -66,6 +67,7 @@ exports.UserSignUp = async (req, res) => {
 
         let result = await sendRegisterEmail(user.email, user.confirmationcode, user.username);
         console.log(result);
+
         if (result.error) {
             console.log("Email not sent!")
             return res.status(200).json(errormessage("Email not sent!"));
@@ -81,9 +83,9 @@ exports.UserSignUp = async (req, res) => {
 exports.LoginUser = async (req, res) => {
     try {
         console.log(req.headers);
-        let { username, password } = req.body;
+        let { username, password ,fcmtoken} = req.body;
 
-        if (!username || !password) {
+        if (!username || !password ||!fcmtoken) {
             return res.status(400).json(errormessage("All fields should be present!"));
         }
 
@@ -105,6 +107,8 @@ exports.LoginUser = async (req, res) => {
             return res.status(400).json(errormessage("Email not Verified! Please verify your mail!"));
         }
 
+        user.fcmtoken=fcmtoken;
+        await user.save();
 
         let token = generateToken(JSON.stringify(user._id));
 
@@ -387,10 +391,13 @@ exports.sendInvite = async (req, res) => {
             return res.status(400).json(errormessage("You both have been or are a buddy!"));
         }
 
-
         let url = `https://sheltered-earth-76230.herokuapp.com/user/${user.buddyid}/invite/${inviteuser.buddyid}`
         let result = await sendInviteEmail(inviteuser.email, inviteuser.username, user, url);
-
+        let user1=await User.findOne({_id:user});
+        if(!user1){
+            return res.status(400).json(errormessage("Invite Sent! Couldn't Send Notification!"));
+        }
+        await sendNotification("Invite Mail Sent!",user1.fcmtoken,"Invite Mail sent to registered mail ID");
         res.status(200).json(successmessage("Invite Sent!"));
 
     } catch (err) {
