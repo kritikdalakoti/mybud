@@ -18,8 +18,19 @@ exports.swipecard = async (req, res) => {
         swipedby = mongoose.Types.ObjectId(swipedby);//1
         status = parseInt(status);
 
+
+
         if (status > 3 || status < 1) {
             return res.status(400).json(errormessage("Status value should be in between 1 and 3"));
+        }
+
+        let isMatch=await swipemodel.findOne({swipedby,swipedon,status:3});
+        if(isMatch){
+            let result=await swipemodel.findOneAndUpdate({swipedby,swipedon},{$set:{status}},{new:true});
+            if(!result){
+                return res.status(400).json(errormessage("Swipe Not SUccessful!"));
+            }
+            return res.status(200).json(successmessage("Swipe Updated!",result)); 
         }
 
         let swipe = new Swipe({
