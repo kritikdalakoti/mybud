@@ -321,10 +321,11 @@ exports.checkValidmatch = async (matches) => {
     if (!chats) {
       return null
     }
+    console.log(123)
     let set = new Set([]);
     if (chats.messages.length >= 2) {
       chats.messages.map(chat => {
-        set.add(chat.sender);
+          set.add(chat.sender.toString());
       })
     }
     console.log('df',set);

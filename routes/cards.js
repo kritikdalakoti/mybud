@@ -22,6 +22,12 @@ router.get(
 )
 
 router.get(
+    '/getuser',
+    auth,
+    cardController.getUser
+)
+
+router.get(
     '/getcards1',
     auth,
     upload.none(),

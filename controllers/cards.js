@@ -4,6 +4,8 @@ const User = require('../models/usermodel');
 const { successmessage, errormessage,checkValidmatch } = require('../utils/util');
 const mongoose = require('mongoose');
 const swipemodel = require('../models/swipemodel');
+const Challenge=require('../models/challenges');
+const Task=require('../models/task');
 
 exports.swipecard = async (req, res) => {
     try {
@@ -391,6 +393,40 @@ exports.getMatchesTime=async(req,res)=>{
 
     }catch(err){
         res.status(400).json(errormessage(err.message));
+    }
+}
+
+exports.getUser=async(req,res)=>{
+    try{
+        let {userid}=req.query;
+        userid=mongoose.Types.ObjectId(userid);
+
+        let result={};
+
+        let user=await User.findOne({_id:userid});
+        if(!user){
+            return res.status(404).json(errormessage("User not found!"));
+        }
+        result.userdetails=user;
+
+        const challenge=await Challenge.findOne({userid});
+        if(!challenge){
+            result.challenge=[]
+        }
+
+        result.challenge=challenge;
+
+        const tasks=await Task.findOne({userid});
+        if(!tasks){
+            result.tasks=[];
+        }
+
+        result.tasks=tasks;
+        res.status(200).json(successmessage("User Details",result));
+        
+
+    }catch(err){
+        res.status(400).json(err.message);
     }
 }
 
