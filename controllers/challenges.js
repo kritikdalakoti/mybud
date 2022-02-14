@@ -108,3 +108,24 @@ exports.getAttendence=async(req,res)=>{
         res.status(200).json(errormessage(err.message));
     }
 }
+
+exports.deleteChallenge=async(req,res)=>{
+    try{
+        let {challengeid}=req.query;
+        if(!challengeid){
+            return res.status(400).json(errormessage("Challenge id not provided!"));
+        }
+
+        challengeid=mongoose.Types.ObjectId(challengeid);
+        let deletedchallenge=await Challenge.findOneAndDelete({_id:challengeid});
+        if(!deletedchallenge){
+            return res.status(400).json(errormessage("Failed to delete!"));
+        }
+
+        res.status(200).json(successmessage("Successfuly Deleted!",deletedchallenge));
+
+
+    }catch(err){
+        res.status(400).json(errormessage(err.message));
+    }
+}

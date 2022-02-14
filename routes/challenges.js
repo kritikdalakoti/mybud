@@ -39,4 +39,10 @@ router.post(
     controller.getAttendence
 )
 
+router.get(
+    '/deletechallenge',
+    auth,
+    controller.deleteChallenge
+)
+
 module.exports=router;
