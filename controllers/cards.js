@@ -409,14 +409,14 @@ exports.getUser=async(req,res)=>{
         }
         result.userdetails=user;
 
-        const challenge=await Challenge.findOne({userid});
+        const challenge=await Challenge.find({userid});
         if(!challenge){
             result.challenge=[]
         }
 
         result.challenge=challenge;
 
-        const tasks=await Task.findOne({userid});
+        const tasks=await Task.find({userid});
         if(!tasks){
             result.tasks=[];
         }
