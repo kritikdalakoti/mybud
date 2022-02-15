@@ -87,7 +87,7 @@ const checkchats = async () => {
                     set.add(chat.sender.toString());
                 })
             }
-            if (set.size() === 1||set.size()===0) {
+            if (set.size === 1||set.size===0) {
                 return res;
             }
         }
