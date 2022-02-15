@@ -84,10 +84,10 @@ const checkchats = async () => {
             let set = new Set([]);
             if (chats.messages.length >= 2) {
                 chats.messages.map(chat => {
-                    set.add(chat.sender);
+                    set.add(chat.sender.toString());
                 })
             }
-            if (set.size() === 1) {
+            if (set.size() === 1||set.size()===0) {
                 return res;
             }
         }
