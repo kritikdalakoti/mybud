@@ -63,7 +63,7 @@ const checkchats = async () => {
                     $add:
                         [
                             "$createdAt",
-                            24 * 60 * 60000
+                             5*60*1000  // 24 * 60 * 60000
                         ]
                 },
                 today: new Date()
@@ -100,7 +100,7 @@ const checkchats = async () => {
 
 }
 
-// cron.schedule('0 */30 * * * *',checkchats);
+cron.schedule('0 */10 * * * *',checkchats);
 // checkchats();
 // checkcompletedChallenges();
 //  hello();

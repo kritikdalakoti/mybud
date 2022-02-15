@@ -475,8 +475,6 @@ exports.resetPassword = async (req, res) => {
         res.status(400).json(errormessage(err.message));
     }
 
-
-
 }
 
 
