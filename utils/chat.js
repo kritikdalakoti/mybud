@@ -49,9 +49,10 @@ exports.storeMessage = async (message, sender, reciever) => {
     let arr=[mongoose.Types.ObjectId(reciever),mongoose.Types.ObjectId(sender)];
 
     let findConditions = {
-        members: {
-            $in:arr
-        }
+         $or:[
+            {members:[mongoose.Types.ObjectId(reciever),mongoose.Types.ObjectId(sender)]},
+            {members:[mongoose.Types.ObjectId(sender),mongoose.Types.ObjectId(reciever)]}
+          ]
     }
     console.log('gr we here')
     let isMatch = await Message.findOne(findConditions);
@@ -74,9 +75,9 @@ exports.storeMessage = async (message, sender, reciever) => {
 
 exports.getMessages=async(userid)=>{
     userid=mongoose.Types.ObjectId(userid);
-    let userchats=await Message.findOne({members:{$in:[userid]}});
+    let userchats=await Message.find({members:{$in:[userid]}});
     if(userchats){
-        return userchats.messages;
+        return userchats
     }
     return [];
 }
