@@ -73,11 +73,19 @@ exports.storeMessage = async (message, sender, reciever) => {
     await Message.findOneAndUpdate(findConditions, { $push: { messages: updates } });
 }
 
-exports.getMessages=async(userid)=>{
-    userid=mongoose.Types.ObjectId(userid);
-    let userchats=await Message.find({members:{$in:[userid]}});
+exports.getMessages=async(user,matcheduser)=>{
+    user=mongoose.Types.ObjectId(user);
+    matcheduser=mongoose.Types.ObjectId(matcheduser);
+    let findConditions={
+        members:{$or:[
+            {members:[mongoose.Types.ObjectId(user),mongoose.Types.ObjectId(matcheduser)]},
+            {members:[mongoose.Types.ObjectId(matcheduser),mongoose.Types.ObjectId(user)]}
+          ]
+        }
+    }
+    let userchats=await Message.findOne(findConditions);
     if(userchats){
-        return userchats
+        return userchats.messages
     }
     return [];
 }
