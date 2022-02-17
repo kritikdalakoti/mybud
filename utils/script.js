@@ -43,7 +43,7 @@ async function hello() {
 }
 
 const checkcompletedChallenges = async () => {
-    let results = await Challenges.updateMany({ isCompleted: false, finalDate: {$gt:todayDate()} }, { $set: { isCompleted: true } }, { new: true });
+    let results = await Challenges.updateMany({ isCompleted: false, finalDate: {$lt:todayDate()} }, { $set: { isCompleted: true } }, { new: true });
     console.log(results);
 }
 
