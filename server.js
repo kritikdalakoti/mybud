@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
 
 
 	// whenever someone joins store or update their socketid in database
-	socket.on('updatesocketid', async (userid) => {
+	socket.on('updatesocketid', async ({userid,matcheduser}) => {
 		let isMatch = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(userid) });
 		if (!isMatch) {
 			let socketdata = new SocketModel({
@@ -62,6 +62,13 @@ io.on('connection', (socket) => {
 				socketid: socket.id
 			}
 			await SocketModel.findOneAndUpdate({ userid: mongoose.Types.ObjectId(userid) }, { $set: updates });
+		}
+
+		let messages=await getMessages(userid,matcheduser);
+		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(userid) });
+		console.log('hghg',socketdata)
+		if(socketdata){
+			socket.to(socketdata.socketid).emit('getmessage',messages);
 		}
 		//let messages = await getMessages(userid); //getting messages of the user who has joined .
 		// socket.emit('messages', messages);
@@ -77,17 +84,17 @@ io.on('connection', (socket) => {
 		}
 	})
 
-	socket.on('getmessage',async({user,matcheduser})=>{
-		console.log('we inside ',user)
-		let messages=await getMessages(user,matcheduser);
-		// console.log('gfhgh',messages);
-		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user) });
-		console.log('hghg',socketdata)
-		if(socketdata){
-			socket.to(socketdata.socketid).emit('getmessage',messages);
-		}
+	// socket.on('getmessage',async({user,matcheduser})=>{
+	// 	console.log('we inside ',user)
+	// 	let messages=await getMessages(user,matcheduser);
+	// 	// console.log('gfhgh',messages);
+	// 	let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user) });
+	// 	console.log('hghg',socketdata)
+	// 	if(socketdata){
+	// 		socket.to(socketdata.socketid).emit('getmessage',messages);
+	// 	}
 		
-	})
+	// })
 
 	// adding a user into a room
 	// socket.on('addinroom', async (member, roomid) => {
