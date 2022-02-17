@@ -5,7 +5,7 @@ const { generateToken, hashPassword, successmessage,
     errormessage, verifypassword, sendRegisterEmail,
     uploadAws, allskills, sendInviteEmail, sendForgotEmail
 } = require('../utils/util');
-const {sendNotification}=require('../utils/notification');
+const { sendNotification } = require('../utils/notification');
 const fs = require('fs');
 
 const path = require('path');
@@ -83,9 +83,9 @@ exports.UserSignUp = async (req, res) => {
 exports.LoginUser = async (req, res) => {
     try {
         console.log(req.headers);
-        let { username, password ,fcmtoken} = req.body;
+        let { username, password, fcmtoken } = req.body;
 
-        if (!username || !password ||!fcmtoken) {
+        if (!username || !password || !fcmtoken) {
             return res.status(400).json(errormessage("All fields should be present!"));
         }
 
@@ -107,7 +107,7 @@ exports.LoginUser = async (req, res) => {
             return res.status(400).json(errormessage("Email not Verified! Please verify your mail!"));
         }
 
-        user.fcmtoken=fcmtoken;
+        user.fcmtoken = fcmtoken;
         await user.save();
 
         let token = generateToken(JSON.stringify(user._id));
@@ -315,7 +315,7 @@ exports.addLocation = async (req, res) => {
             return res.status(400).json(errormessage("Provide lOcation!"));
         }
 
-        let updateduser = await User.findOneAndUpdate({ _id: JSON.parse((user)) }, { $set: { location } }, { new: true });
+        let updateduser = await User.findOneAndUpdate({ _id: mongoose.Types.ObjectId(JSON.parse(user))  }, { $set: { location } }, { new: true });
         if (!user) {
             return res.status(400).json(errormessage("Couldn't Update"));
         }
@@ -393,11 +393,11 @@ exports.sendInvite = async (req, res) => {
 
         let url = `https://sheltered-earth-76230.herokuapp.com/user/${user.buddyid}/invite/${inviteuser.buddyid}`
         let result = await sendInviteEmail(inviteuser.email, inviteuser.username, user, url);
-        let user1=await User.findOne({_id:user});
-        if(!user1){
+        let user1 = await User.findOne({ _id: user });
+        if (!user1) {
             return res.status(400).json(errormessage("Invite Sent! Couldn't Send Notification!"));
         }
-        await sendNotification("Invite Mail Sent!",user1.fcmtoken,"Invite Mail sent to registered mail ID");
+        await sendNotification("Invite Mail Sent!", user1.fcmtoken, "Invite Mail sent to registered mail ID");
         res.status(200).json(successmessage("Invite Sent!"));
 
     } catch (err) {
@@ -477,5 +477,33 @@ exports.resetPassword = async (req, res) => {
 
 }
 
+exports.editskills = async (req, res) => {
+    try {
+        let { skillsets } = req.body;
+        let { user } = req;
+        console.log('fdgd', skillsets)
+
+        user = mongoose.Types.ObjectId(JSON.parse(user));
+
+        if (!skillsets) {
+            return res.status(400).json(errormessage("All fields should be given!"));
+        }
+        skillsets = skillsets.split(",");
+
+        let updates = {
+            skillsets
+        }
+
+        let updatedUser = await User.findOneAndUpdate({ _id: user }, { $set: updates }, { new: true });
+        if (!updatedUser) {
+            return res.status(400).json(errormessage("Unable to Update!"));
+        }
+
+        res.status(200).json(successmessage("Successfuly Updated", updatedUser));
+
+    } catch (err) {
+        res.status(400).json(errormessage(err.message));
+    }
+}
 
 

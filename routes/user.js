@@ -121,4 +121,11 @@ router.post(
     Usercontroller.resetPassword
 )
 
+router.patch(
+    '/editskill',
+    auth,
+    upload.none(),
+    Usercontroller.editskills
+)
+
 module.exports = router;
