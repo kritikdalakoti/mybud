@@ -82,7 +82,10 @@ io.on('connection', (socket) => {
 		let messages=await getMessages(user,matcheduser);
 		// console.log('gfhgh',messages);
 		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user) });
-		socket.to(socketdata.socketid).emit('getmessage',messages);
+		if(socketdata){
+			socket.to(socketdata.socketid).emit('getmessage',messages);
+		}
+		
 	})
 
 	// adding a user into a room
