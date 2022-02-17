@@ -80,8 +80,9 @@ io.on('connection', (socket) => {
 	socket.on('getmessage',async({user,matcheduser})=>{
 		console.log('we inside ')
 		let messages=await getMessages(user,matcheduser);
-		console.log('gfhgh',messages);
-		socket.emit('getmessage',messages);
+		// console.log('gfhgh',messages);
+		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user) });
+		socket.to(socketdata.socketid).emit('getmessage',messages);
 	})
 
 	// adding a user into a room
