@@ -79,6 +79,7 @@ io.on('connection', (socket) => {
 
 	socket.on('getmessage',async({user,matcheduser})=>{
 		let messages=await getMessages(user,matcheduser);
+		console.log('gfhgh',messages);
 		socket.emit('getmessage',messages);
 	})
 
