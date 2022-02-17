@@ -54,9 +54,9 @@ exports.storeMessage = async (message, sender, reciever) => {
             {members:[mongoose.Types.ObjectId(sender),mongoose.Types.ObjectId(reciever)]}
           ]
     }
-    console.log('gr we here')
+    //console.log('gr we here')
     let isMatch = await Message.findOne(findConditions);
-    console.log('fdbg',isMatch);
+    //console.log('fdbg',isMatch);
     if (!isMatch) {
         let message = new Message({
             members: [mongoose.Types.ObjectId(sender),

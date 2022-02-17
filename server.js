@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('privatemessage', async ({ user1, user2, message }) => {
-		console.log('inside', user1, user2, message);
+		// console.log('inside', user1, user2, message);
 		await storeMessage(message, user1, user2);
 		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user2) });
 		if (socketdata) { // if only one is online then only send him the message otherwise just store his messages.
@@ -78,6 +78,7 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('getmessage',async({user,matcheduser})=>{
+		console.log('we inside ')
 		let messages=await getMessages(user,matcheduser);
 		console.log('gfhgh',messages);
 		socket.emit('getmessage',messages);
