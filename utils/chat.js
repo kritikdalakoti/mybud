@@ -77,11 +77,10 @@ exports.getMessages=async(user,matcheduser)=>{
     user=mongoose.Types.ObjectId(user);
     matcheduser=mongoose.Types.ObjectId(matcheduser);
     let findConditions={
-        members:{$or:[
+        $or:[
             {members:[mongoose.Types.ObjectId(user),mongoose.Types.ObjectId(matcheduser)]},
             {members:[mongoose.Types.ObjectId(matcheduser),mongoose.Types.ObjectId(user)]}
-          ]
-        }
+        ]
     }
     let userchats=await Message.findOne(findConditions);
     if(userchats){
