@@ -82,6 +82,7 @@ io.on('connection', (socket) => {
 		let messages=await getMessages(user,matcheduser);
 		// console.log('gfhgh',messages);
 		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user) });
+		console.log('hghg',socketdata)
 		if(socketdata){
 			socket.to(socketdata.socketid).emit('getmessage',messages);
 		}
