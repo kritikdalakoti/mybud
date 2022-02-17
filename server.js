@@ -68,8 +68,9 @@ io.on('connection', (socket) => {
 
 		let messages=await getMessages(userid,matcheduser);
 		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(userid) });
-		console.log('hghg',socketdata)
+		console.log('hghg',socketdata);
 		if(socketdata){
+			console.log('ghc',messages)
 			socket.to(socketdata.socketid).emit('getmessage',messages);
 		}
 		//let messages = await getMessages(userid); //getting messages of the user who has joined .
