@@ -22,6 +22,12 @@ exports.takeChallenge=async(req,res)=>{
         if(user_challenge){
             return res.status(400).json(errormessage("You have already taken this challenge and not yet finished it!"))
         }
+
+        let ismatch=await Challenge.find({userid:user,isCompleted:false});
+        if(ismatch.length>=3){
+            return res.status(400).json(errormessage("Already Enrolled in 3 Challenges!"));
+        }
+
         let date=new Date();
         date.setDate(date.getDate()+days);
 
