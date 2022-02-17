@@ -100,7 +100,7 @@ const checkchats = async () => {
 
 }
 
-cron.schedule('0 */10 * * * *',checkchats);
+cron.schedule('0 */60 * * * *',checkchats);
 // checkchats();
 // checkcompletedChallenges();
 //  hello();
