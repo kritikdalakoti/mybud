@@ -78,7 +78,7 @@ io.on('connection', (socket) => {
 	})
 
 	socket.on('getmessage',async({user,matcheduser})=>{
-		console.log('we inside ')
+		console.log('we inside ',user)
 		let messages=await getMessages(user,matcheduser);
 		// console.log('gfhgh',messages);
 		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(user) });
