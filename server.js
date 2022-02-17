@@ -71,7 +71,7 @@ io.on('connection', (socket) => {
 		console.log('hghg',socketdata);
 		if(socketdata){
 			console.log('ghc',messages)
-			socket.to(socketdata.socketid).emit('getmessage',messages);
+			socket.emit('getmessage',messages);
 		}
 		//let messages = await getMessages(userid); //getting messages of the user who has joined .
 		// socket.emit('messages', messages);
