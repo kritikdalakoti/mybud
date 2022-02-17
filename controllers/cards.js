@@ -376,8 +376,12 @@ exports.getMatchesTime=async(req,res)=>{
     try{
         let {user}=req;
         user=mongoose.Types.ObjectId(JSON.parse(user));
-
-        let matches=await Match.find({users:{$in:[user]}});
+        let {userid}=req.query;
+        userid=mongoose.Types.ObjectId(userid);
+        let matches=await Match.find({$or:[
+            {users:[user,userid]},
+            {users:[userid,user]},
+        ]});
         console.log('dvd',matches);
         let results=await Promise.all(matches.map(match=>{
             let result={
