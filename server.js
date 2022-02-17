@@ -51,6 +51,7 @@ io.on('connection', (socket) => {
 	// whenever someone joins store or update their socketid in database
 	socket.on('updatesocketid', async ({userid,matcheduser}) => {
 		console.log('hello',userid);
+		// console.log('hello',matcheduser);
 		let isMatch = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(userid) });
 		if (!isMatch) {
 			let socketdata = new SocketModel({
@@ -69,7 +70,7 @@ io.on('connection', (socket) => {
 		let socketdata = await SocketModel.findOne({ userid: mongoose.Types.ObjectId(userid) });
 		console.log('hghg',socketdata)
 		if(socketdata){
-			socket.to(socket.id).emit('getmessage',messages);
+			socket.to(socketdata.socketid).emit('getmessage',messages);
 		}
 		//let messages = await getMessages(userid); //getting messages of the user who has joined .
 		// socket.emit('messages', messages);
