@@ -101,7 +101,7 @@ exports.getCards = async (req, res) => {
         let isres=await checkValidmatch(ismatch);
         // console.log('das',isres);
         // console.log(user);
-        console.log(mongoose.Types.ObjectId(JSON.parse(user)));
+        //console.log(mongoose.Types.ObjectId(JSON.parse(user)));
         if(isres.length){
             
             let user1=await User.findOne({_id:mongoose.Types.ObjectId(JSON.parse(user))});
@@ -132,7 +132,7 @@ exports.getCards = async (req, res) => {
                     }else{
                         userdetails.push(user2);
                     }
-                    console.log('e',userdetails)
+                    //console.log('e',userdetails)
                 })
             )
             
@@ -190,7 +190,7 @@ exports.getCards = async (req, res) => {
     ]).allowDiskUse(true);
 
     let totalNumber = eligibleusers.length;
-    console.log('dsfdf',userdetails)
+    //console.log('dsfdf',userdetails)
     let result = {
         message: 'File List Page Number ' + page,
         data: eligibleusers,
@@ -263,7 +263,7 @@ exports.getCards1 = async (req, res) => {
             }
         ]).allowDiskUse(true);
 
-        console.log(dislikedusers);
+        //console.log(dislikedusers);
 
         let filtered_array = dislikedusers.length?dislikedusers[0].swipedusers:[];
 

@@ -311,24 +311,24 @@ exports.todayDate = (date2) => {
 }
 
 exports.checkValidmatch = async (matches) => {
-  console.log('fdsfd',matches)
+  //console.log('fdsfd',matches)
   let tobefiltered = await Promise.all(matches.map(async match => {
     let chats = await Chats.findOne({$or:[
       {members:[match.users[0],match.users[1]]},
       {members:[match.users[1],match.users[0]]}
     ] });
-    console.log('sfa',chats)
+    //console.log('sfa',chats)
     if (!chats) {
       return null
     }
-    console.log(123)
+    //console.log(123)
     let set = new Set([]);
     if (chats.messages.length >= 2) {
       chats.messages.map(chat => {
           set.add(chat.sender.toString());
       })
     }
-    console.log('df',set);
+    //console.log('df',set);
     // return set.size;
     // console.log('df', set.size);
     if (set.size > 1) {
@@ -361,8 +361,6 @@ exports.checkValidmatch = async (matches) => {
   //})
   //return res;
 }
-
-
 
 
 
