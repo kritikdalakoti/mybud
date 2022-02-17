@@ -43,7 +43,7 @@ async function hello() {
 }
 
 const checkcompletedChallenges = async () => {
-    let results = await Challenges.updateMany({ isCompleted: false, finalDate: todayDate() }, { $set: { isCompleted: true } }, { new: true });
+    let results = await Challenges.updateMany({ isCompleted: false, finalDate: {$gt:todayDate()} }, { $set: { isCompleted: true } }, { new: true });
     console.log(results);
 }
 
@@ -100,7 +100,9 @@ const checkchats = async () => {
 
 }
 
-cron.schedule('0 */50 * * * *',checkchats);
+cron.schedule('0 */15 * * * *',checkchats);
+// cron.schedule('0 */30 * * * *',checkchats);
+cron.schedule('0 */15 * * * *',checkcompletedChallenges);
 // checkchats();
 // checkcompletedChallenges();
 //  hello();
