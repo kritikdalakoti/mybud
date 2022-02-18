@@ -43,7 +43,7 @@ async function hello() {
 }
 
 const checkcompletedChallenges = async () => {
-    let results = await Challenges.updateMany({ isCompleted: false, finalDate: {$lt:todayDate()} }, { $set: { isCompleted: true } }, { new: true });
+    let results = await Challenges.updateMany({ isCompleted: false, finalDate: { $lt: todayDate() } }, { $set: { isCompleted: true } }, { new: true });
     console.log(results);
 }
 
@@ -63,7 +63,7 @@ const checkchats = async () => {
                     $add:
                         [
                             "$createdAt",
-                             5*60*1000  // 24 * 60 * 60000
+                            24 * 60 * 60000
                         ]
                 },
                 today: new Date()
@@ -87,7 +87,7 @@ const checkchats = async () => {
                     set.add(chat.sender.toString());
                 })
             }
-            if (set.size === 1||set.size===0) {
+            if (set.size === 1 || set.size === 0) {
                 return res;
             }
         }
@@ -100,9 +100,9 @@ const checkchats = async () => {
 
 }
 
-cron.schedule('0 */15 * * * *',checkchats);
+cron.schedule('0 */60 * * * *', checkchats);
 // cron.schedule('0 */30 * * * *',checkchats);
-cron.schedule('0 */15 * * * *',checkcompletedChallenges);
+cron.schedule('50 23 * * *', checkcompletedChallenges);
 // checkchats();
 // checkcompletedChallenges();
 //  hello();
