@@ -14,7 +14,7 @@ const mongoose = require('mongoose');
 exports.UserSignUp = async (req, res) => {
     try {
         console.log(req.body)
-        let { username, password, email, phoneno } = req.body;
+        let { username, password, email, phoneno, isAdmin } = req.body;
         if (!username || !password || !email || !phoneno) {
             return res.status(400).json(errormessage("All fields must be present"));
         }
@@ -25,7 +25,7 @@ exports.UserSignUp = async (req, res) => {
         phoneno = phoneno.trim();
 
         //checking if email exists already and not verified
-        let ismatch = await User.findOne({ email, status: false });
+        let ismatch = await User.findOne({ email, status: false ,});
         if (ismatch) {
             return res.status(400).json(errormessage("Email already registered! Verify email to continue!"));
         }

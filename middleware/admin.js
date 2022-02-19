@@ -12,7 +12,7 @@ exports.Adminauth=async (req,res,next)=>{
         }
     
         let userid=jwt.verify(token,process.env.TOKEN_SECRET);
-        let user=await User.findOne({_id:JSON.parse(userid),admin:true});
+        let user=await User.findOne({_id:JSON.parse(userid),isAdmin:true});
         if(!user){
             return res.status(400).json(errormessage("Log in as Admin failed!"));
         }

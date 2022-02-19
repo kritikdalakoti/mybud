@@ -56,7 +56,11 @@ const UserSchema= new mongoose.Schema({
         default:false
     },
     forgetpasscode:String,
-    fcmtoken:String
+    fcmtoken:String,
+    isAdmin:{
+        type:Boolean,
+        default:false
+    }
 })
 
 UserSchema.index({username:1,email:1});

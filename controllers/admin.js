@@ -3,6 +3,44 @@ const User = require('../models/usermodel');
 const matchModel = require('../models/match');
 const { successmessage, errormessage } = require('../utils/util');
 
+exports.loginAdmin=async(req,res)=>{
+    try {
+        console.log(req.headers);
+        let { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json(errormessage("All fields should be present!"));
+        }
+
+        email = email.trim();
+        password = password.trim();
+
+        // check whether email exists or not
+        let user = await User.findOne({ email,isAdmin:true });
+        if (!user) {
+            return res.status(400).json(errormessage("Email or password incorrect!"));
+        }
+
+        if (!verifypassword(password, user.password)) {
+            return res.status(400).json(errormessage("Email or password incorrect!"));
+        }
+
+        //checking whether verified email or not
+        // if (!user.status) {
+        //     return res.status(400).json(errormessage("Email not Verified! Please verify your mail!"));
+        // }
+
+        // user.fcmtoken = fcmtoken;
+        await user.save();
+
+        let token = generateToken(JSON.stringify(user._id));
+
+        res.status(200).json(successmessage("Logged In Successfuly!", token));
+
+    } catch (err) {
+        res.status(400).json(errormessage(err.message));
+    }
+}
 
 exports.getAllUsers = async (req, res) => {
     try {

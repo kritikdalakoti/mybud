@@ -4,6 +4,11 @@ const {Adminauth}=require('../middleware/admin');
 const AdminController=require('../controllers/admin');
 const router=Router();
 
+router.post(
+    'login',
+    AdminController.loginAdmin
+)
+
 router.get(
     '/allusers',
     // adminAuth,
