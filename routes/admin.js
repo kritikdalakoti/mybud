@@ -5,7 +5,7 @@ const AdminController=require('../controllers/admin');
 const router=Router();
 
 router.post(
-    'login',
+    '/login',
     AdminController.loginAdmin
 )
 
