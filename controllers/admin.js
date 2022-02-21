@@ -59,7 +59,7 @@ exports.getAllUsers = async (req, res) => {
         let count= await User.countDocuments();
         let counts=count-start;
 
-        let totalpages= counts%perpage===0?counts/perpage:counts/perpage+1;
+        let totalpages= counts%perpage===0? parseInt(counts/perpage) : parseInt(counts/perpage+1) ;
         let users = await User.find({status:true}).sort({ _id: -1 }).skip(start).limit(perpage);
         res.status(200).json(successmessage("All Users", {users,totalpages}));
 
