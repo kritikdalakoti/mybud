@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 const User = require('../models/usermodel');
 const matchModel = require('../models/match');
-const { successmessage, errormessage,verifypassword,generateToken } = require('../utils/util');
+const { successmessage, errormessage, verifypassword, generateToken } = require('../utils/util');
 
-exports.loginAdmin=async(req,res)=>{
+exports.loginAdmin = async (req, res) => {
     try {
         console.log(req.headers);
         let { email, password } = req.body;
@@ -16,7 +16,7 @@ exports.loginAdmin=async(req,res)=>{
         password = password.trim();
 
         // check whether email exists or not
-        let user = await User.findOne({ email,isAdmin:true });
+        let user = await User.findOne({ email, isAdmin: true });
         if (!user) {
             return res.status(400).json(errormessage("Email or password incorrect!"));
         }
@@ -56,12 +56,13 @@ exports.getAllUsers = async (req, res) => {
         page = parseInt(page);
         let start = (page - 1) * perpage;
 
-        let count= await User.countDocuments();
-        let counts=count-start;
+        let count = await User.countDocuments();
+        let counts = count - start;
+        let total_pages = count % perpage === 0 ? parseInt(count / perpage) : parseInt(count / perpage) + 1;
 
-        let pagesleft= counts%perpage===0? parseInt(counts/perpage) : parseInt(counts/perpage) ;
-        let users = await User.find({status:true}).sort({ _id: -1 }).skip(start).limit(perpage);
-        res.status(200).json(successmessage("All Users", {users,pagesleft}));
+        let pagesleft = counts % perpage === 0 ? parseInt(counts / perpage) : parseInt(counts / perpage);
+        let users = await User.find({ status: true }).sort({ _id: -1 }).skip(start).limit(perpage);
+        res.status(200).json(successmessage("All Users", { users, pagesleft,total_pages }));
 
     } catch (err) {
         res.status(400).json(errormessage(err.message));
@@ -93,16 +94,18 @@ exports.getmatches = async (req, res) => {
                     'let': { 'uid': '$users' },
                     'pipeline': [
                         { '$match': { '$expr': { '$in': ['$_id', '$$uid'] } } },
-                        {$project:{
-                            password:0,
-                            confirmationcode:0,
-                            status:0
-                        }}
+                        {
+                            $project: {
+                                password: 0,
+                                confirmationcode: 0,
+                                status: 0
+                            }
+                        }
                     ],
                     'as': 'userdata'
                 }
             },
-            
+
         ]).allowDiskUse(true);
         res.status(200).json(successmessage("user Details", matches));
 
@@ -112,18 +115,18 @@ exports.getmatches = async (req, res) => {
 }
 
 
-exports.UserVerify=async(req,res)=>{
-    try{
-        let{user,status}=req.body;
-        if(status){
-            let user1=await User.findOneAndUpdate({_id:mongoose.Types.ObjectId(user)},{$set:{adminverified:true}},{new:true});
-            return res.status(200).json(successmessage("Verified Successfuly!",user1));
+exports.UserVerify = async (req, res) => {
+    try {
+        let { user, status } = req.body;
+        if (status) {
+            let user1 = await User.findOneAndUpdate({ _id: mongoose.Types.ObjectId(user) }, { $set: { adminverified: true } }, { new: true });
+            return res.status(200).json(successmessage("Verified Successfuly!", user1));
         }
 
-        let user1=await User.findOneAndDelete({_id:mongoose.Types.ObjectId(user)});
-        res.status(200).json(errormessage("Successfuly Removed User!",user1));
-        
-    }catch(err){
+        let user1 = await User.findOneAndDelete({ _id: mongoose.Types.ObjectId(user) });
+        res.status(200).json(errormessage("Successfuly Removed User!", user1));
+
+    } catch (err) {
         res.status(400).json(errormessage(err.message));
     }
 }
