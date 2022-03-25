@@ -1,131 +1,62 @@
 const express = require('express');
 const router = express.Router();
-const path =require('path');
+const path = require('path');
 const Usercontroller = require('../controllers/user');
 const { auth } = require('../middleware/auth');
 const User = require('../models/usermodel');
-const multer=require('multer');
+const multer = require('multer');
 
 const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        callback(null, path.join(__dirname,'../uploads'));
-    },
-    filename: (req, file, callback) => {
-        callback(null, file.originalname)
-    }
-})
-console.log( path.join(__dirname,'../uploads') )
-const upload=multer({storage});
+	destination: (req, file, callback) => {
+		callback(null, path.join(__dirname, '../uploads'));
+	},
+	filename: (req, file, callback) => {
+		callback(null, file.originalname);
+	},
+});
+console.log(path.join(__dirname, '../uploads'));
+const upload = multer({ storage });
 
-router.post(
-    '/signup',
-    upload.none(),
-    Usercontroller.UserSignUp
-);
-router.post(
-    '/login',
-    upload.none(),
-    Usercontroller.LoginUser
-);
+router.post('/signup', upload.none(), Usercontroller.UserSignUp);
+router.post('/login', upload.none(), Usercontroller.LoginUser);
 router.get('/me', auth, async (req, res) => {
-    let user = await User.findOne({ _id: JSON.parse(req.user) });
-    res.json(user);
-})
+	let user = await User.findOne({ _id: JSON.parse(req.user) });
+	res.json(user);
+});
+
+router.post('/verifyemail', upload.none(), Usercontroller.verifyCode);
+
+router.post('/resendotp', upload.none(), Usercontroller.resendOTP);
 
 router.post(
-    '/verifyemail',
-    upload.none(),
-    Usercontroller.verifyCode
+	'/upload',
+	auth,
+	upload.single('image'),
+	Usercontroller.Uploadimage
 );
 
-router.post(
-    '/resendotp',
-    upload.none(),
-    Usercontroller.resendOTP
-)
+router.get('/get/image', auth, upload.none(), Usercontroller.getUserimage);
 
-router.post(
-    '/upload',
-    auth,
-    upload.single("image"),
-    Usercontroller.Uploadimage
-)
+router.post('/add/details', auth, upload.none(), Usercontroller.setdetails);
 
-router.get(
-    '/get/image',
-    auth,
-    upload.none(),
-    Usercontroller.getUserimage
-)
+router.get('/get/profile', auth, upload.none(), Usercontroller.getProfile);
 
-router.post(
-    '/add/details',
-    auth,
-    upload.none(),
-    Usercontroller.setdetails
-)
+router.post('/add/location', auth, upload.none(), Usercontroller.addLocation);
 
-router.get(
-    '/get/profile',
-    auth,
-    upload.none(),
-    Usercontroller.getProfile
-)
+router.get('/allskills', auth, Usercontroller.getSkills);
 
-router.post(
-    '/add/location',
-    auth,
-    upload.none(),
-    Usercontroller.addLocation
-)
+router.get('/filteredskills', auth, Usercontroller.getfilteredskills);
 
-router.get(
-    '/allskills',
-    auth,
-    Usercontroller.getSkills
-)
+router.get('/searchbuddy', auth, Usercontroller.searchbuddyid);
 
-router.get(
-    '/filteredskills',
-    auth,
-    Usercontroller.getfilteredskills
-)
+router.post('/sendinvite', auth, upload.none(), Usercontroller.sendInvite);
 
-router.get(
-    '/searchbuddy',
-    auth,
-    Usercontroller.searchbuddyid
-)
+router.get('/:userbuddy/invite/:recieverbuddy', Usercontroller.verifyinvite);
 
-router.post(
-    '/sendinvite',
-    auth,
-    upload.none(),
-    Usercontroller.sendInvite
-)
+router.post('/forgotpassword', upload.none(), Usercontroller.forgotpassword);
 
-router.get(
-    '/:userbuddy/invite/:recieverbuddy',
-    Usercontroller.verifyinvite
-)
+router.post('/resetpassword', upload.none(), Usercontroller.resetPassword);
 
-router.post(
-    '/forgotpassword',
-    upload.none(),
-    Usercontroller.forgotpassword
-)
-
-router.post(
-    '/resetpassword',
-    upload.none(),
-    Usercontroller.resetPassword
-)
-
-router.patch(
-    '/editskill',
-    auth,
-    upload.none(),
-    Usercontroller.editskills
-)
+router.patch('/editskill', auth, upload.none(), Usercontroller.editskills);
 
 module.exports = router;
