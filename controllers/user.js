@@ -9,7 +9,6 @@ const {
 	verifypassword,
 	sendRegisterEmail,
 	uploadAws,
-	allskills,
 	sendInviteEmail,
 	sendForgotEmail,
 } = require('../utils/util');
@@ -388,12 +387,12 @@ exports.addLocation = async (req, res) => {
 };
 
 exports.getSkills = async (req, res) => {
-	const allskills = await Skills.find({}, { skills: 1 });
-	if (allskills.length) {
-		const skills = allskills[0].skills;
+	const allSkills = await Skills.find({}, { skills: 1 });
+	if (allSkills.length) {
+		const skills = allSkills[0].skills;
 		res.status(200).json(successmessage('all skills', skills));
 	}
-	res.status(200).json(successmessage('all skills', allskills));
+	res.status(200).json(successmessage('all skills', allSkills));
 };
 
 exports.getfilteredskills = async (req, res) => {
