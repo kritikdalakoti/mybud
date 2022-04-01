@@ -398,13 +398,13 @@ exports.getSkills = async (req, res) => {
 exports.getfilteredskills = async (req, res) => {
 	try {
 		let { keyword } = req.query;
-		let skills = await Skills.find();
-		if (skills.length) {
-			skills = allskills[0].skills;
+		let getSkills = await Skills.find();
+		if (getSkills.length) {
+			getSkills = getSkills[0].skills;
 		}
 		let regtomatch = new RegExp(`^${keyword}.*`, 'ig');
 
-		let filteredskills = skills.filter((skill) =>
+		let filteredskills = getSkills.filter((skill) =>
 			skill.match(regtomatch) ? skill : null
 		);
 		res.status(200).json(successmessage('Filtered Skills', filteredskills));
@@ -579,6 +579,21 @@ exports.editskills = async (req, res) => {
 			return res.status(400).json(errormessage('All fields should be given!'));
 		}
 		skillsets = skillsets.split(',');
+		for (var rev of skillsets) {
+			rev = rev.trim();
+			const findDoc = await Skills.find({}, { skills: 1 });
+			if (findDoc.length) {
+				const findSkill = await Skills.find({
+					skills: { $in: [new RegExp(`^${rev}$`, 'i')] },
+				});
+				if (!findSkill.length) {
+					findDoc[0].skills.push(rev);
+					await findDoc[0].save({ validateBeforeSave: false });
+				}
+			} else {
+				await Skills.create({ skills: skillsets });
+			}
+		}
 
 		let updates = {
 			skillsets,
