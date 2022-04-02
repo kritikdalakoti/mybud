@@ -59,4 +59,8 @@ router.post('/resetpassword', upload.none(), Usercontroller.resetPassword);
 
 router.patch('/editskill', auth, upload.none(), Usercontroller.editskills);
 
+router.get('/getUsers', upload.none(), Usercontroller.getUsers);
+
+router.post('/deleteUser', upload.none(), Usercontroller.deleteUser);
+
 module.exports = router;
